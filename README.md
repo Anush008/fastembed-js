@@ -1,6 +1,10 @@
 # ⚡️ FastEmbed-JS
 
-FastEmbed-JS is a Typescript/NodeJS implementation of [@Qdrant/fastembed](https://github.com/qdrant/fastembed). 
+FastEmbed-JS is a Typescript/NodeJS implementation of [@Qdrant/fastembed](https://github.com/qdrant/fastembed).
+
+* Supports CommonJS and ESM.
+* Uses [@anush008/tokenizers](https://github.com/Anush008/tokenizers) multi-arch native bindings for [@huggingface/tokenizers](https://github.com/huggingface/tokenizers).
+* Supports batch embedddings with generators.
 
 The default embedding supports "query" and "passage" prefixes for the input text. The default model is Flag Embedding, which is top of the [MTEB](https://huggingface.co/spaces/mteb/leaderboard) leaderboard.
 
@@ -29,6 +33,8 @@ npm install fastembed
 
 ```js
 import { EmbeddingModel, FlagEmbedding } from "fastembed";
+// For CommonJS
+// const { EmbeddingModel, FlagEmbedding } = require("fastembed)
 
 const embeddingModel = await FlagEmbedding.init({
     modelName: EmbeddingModel.BGEBaseEN

@@ -33,8 +33,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GIT_COMMITTER_NAME: "Anush008"
-          GIT_COMMITTER_EMAIL: "46051506+Anush008@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "github-actions[bot]"
+          GIT_COMMITTER_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
         uses: docker://ghcr.io/open-sauced/release:2.4.0
   
       - name: "echo outputs"

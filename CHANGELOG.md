@@ -5,6 +5,19 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.4.2](https://github.com/Anush008/fastembed/compare/v1.4.1...v1.4.2) (2023-09-17)
+
+
+### ✅ Tests
+
+* Configure testing ([#1](https://github.com/Anush008/fastembed/issues/1)) ([9f00c9c](https://github.com/Anush008/fastembed/commit/9f00c9c48b354cabc28e6031d6164fc251ad09c9))
+
+
+### 🔁 Continuous Integration
+
+* disable threads ([bc98480](https://github.com/Anush008/fastembed/commit/bc9848050b7d98a47e25d4e28710e1d23672022d))
+* test with node ([a72f3d1](https://github.com/Anush008/fastembed/commit/a72f3d1791acc15d690f9d6760b3a03136f153e7))
+
 ## [1.4.1](https://github.com/Anush008/fastembed/compare/v1.4.0...v1.4.1) (2023-09-17)
 
 

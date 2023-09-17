@@ -5,6 +5,14 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.3.0](https://github.com/Anush008/fastembed/compare/v1.2.0...v1.3.0) (2023-09-17)
+
+
+### 📝 Documentation
+
+* Update LICENSE ([4ee4169](https://github.com/Anush008/fastembed/commit/4ee41696e2b09eb77e71c2d61c251e831baefe8e))
+* update README.md ([aa5b28d](https://github.com/Anush008/fastembed/commit/aa5b28d07fae2b3a1a122538c452976125ca0f03))
+
 ## [1.2.0](https://github.com/Anush008/fastembed/compare/v1.1.0...v1.2.0) (2023-09-17)
 
 

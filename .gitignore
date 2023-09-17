@@ -6,6 +6,9 @@
 /out-tsc
 /lib
 
+# Model files
+/local_cache
+
 # Runtime data
 pids
 *.pid

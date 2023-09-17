@@ -1,6 +1,6 @@
 {
   "name": "fastembed",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "NodeJS implementation of @Qdrant/fastembed",
   "licenses": [
     {
@@ -22,7 +22,13 @@
   "files": [
     "lib/"
   ],
-  "keywords": ["embeddings", "fastembed", "onnxruntime", "semantic", "search"],
+  "keywords": [
+    "embeddings",
+    "fastembed",
+    "onnxruntime",
+    "semantic",
+    "search"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {

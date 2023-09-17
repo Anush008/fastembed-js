@@ -8,18 +8,13 @@ FastEmbed-JS is a Typescript/NodeJS implementation of [@Qdrant/fastembed](https:
 
 The default embedding supports "query" and "passage" prefixes for the input text. The default model is Flag Embedding, which is top of the [MTEB](https://huggingface.co/spaces/mteb/leaderboard) leaderboard.
 
-1. Light
-    - Quantized model weights
-    - ONNX Runtime for inference
-    - No hidden dependencies via Huggingface Transformers
+## 🤖 Models
 
-2. Accuracy/Recall
-    - Better than OpenAI Ada-002
-    - Default is Flag Embedding, which is top of the [MTEB](https://huggingface.co/spaces/mteb/leaderboard) leaderboard
+- [**BAAI/bge-base-en-v1.5**](https://huggingface.co/BAAI/bge-base-en-v1.5)
+- [**BAAI/bge-small-en-v1.5**](https://huggingface.co/BAAI/bge-small-en-v1.5) - Default
+- [**sentence-transformers/all-MiniLM-L12-v2**](https://huggingface.co/sentence-transformers/all-MiniLM-L12-v2)
 
-3. Fast
-    - Lot faster for batches!
-    - ONNX Runtime allows you to use dedicated runtimes for even higher throughput and lower latency 
+
 
 ## 🚀 Installation
 
@@ -45,7 +40,7 @@ let documents = [
     "query: Hello, World!", // these are two different embedding
     "passage: This is an example passage.",
     //# You can leave out the prefix but it's recommended
-    "fastembed is supported by and maintained by Qdrant." 
+    "fastembed-js is licensed under MIT" 
 ];
 
 const embeddings = embeddingModel.embed(documents, 2); //Optional batch size. Defaults to 256

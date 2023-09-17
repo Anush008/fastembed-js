@@ -17,14 +17,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "🔧 setup Bun"
-        uses: oven-sh/setup-bun@v1
+      - name: "🔧 setup node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: "🔧 install npm@latest"
+        run: npm i -g npm@latest
 
       - name: "📦 install dependencies"
-        run: bun install
+        uses: bahmutov/npm-install@v1
         
       - name: "Run Vitest"
-        run: bun run test
+        run: npm run test
         
   release:
     runs-on: ubuntu-latest

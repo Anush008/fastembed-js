@@ -25,6 +25,7 @@ export interface InitOptions {
   executionProviders: ExecutionProvider[];
   maxLength: number;
   cacheDir: string;
+  showDownloadProgress: boolean;
 }
 
 function normalize(v: number[]): number[] {
@@ -60,14 +61,16 @@ function create3DArray(
 }
 
 abstract class Embedding {
-  // @ts-ignore
-  async abstract *embed(texts: string[], batchSize?: number): AsyncGenerator<number[][], void, unknown>;
+  abstract embed(
+    texts: string[],
+    batchSize?: number
+  ): AsyncGenerator<number[][], void, unknown>;
 
   private static async downloadFileFromGCS(
     url: string,
     outputFilePath: PathLike,
     modelName: string,
-    showProgress: boolean = true
+    showDownloadProgress: boolean = true
   ): Promise<PathLike> {
     if (fs.existsSync(outputFilePath)) {
       return outputFilePath;
@@ -98,7 +101,7 @@ abstract class Embedding {
             );
           }
 
-          if (showProgress) {
+          if (showDownloadProgress) {
             const progressBar = new Progress(
               `Downloading ${modelName} [:bar] :percent :etas`,
               {
@@ -153,7 +156,8 @@ abstract class Embedding {
 
   protected static async retrieveModel(
     model: EmbeddingModel,
-    cacheDir: PathLike
+    cacheDir: PathLike,
+    showDownloadProgress: boolean = true
   ): Promise<PathLike> {
     if (!model.includes("/")) {
       throw new Error(
@@ -180,7 +184,8 @@ abstract class Embedding {
     await this.downloadFileFromGCS(
       `https://storage.googleapis.com/qdrant-fastembed/${fastModelName}.tar.gz`,
       modelTarGz,
-      modelName
+      modelName,
+      showDownloadProgress
     );
     await this.decompressToCache(modelTarGz, cacheDir);
     fs.unlinkSync(modelTarGz);
@@ -209,8 +214,9 @@ export class FlagEmbedding extends Embedding {
     executionProviders = [ExecutionProvider.CPU],
     maxLength = 512,
     cacheDir = "local_cache",
+    showDownloadProgress = true,
   }: Partial<InitOptions> = {}) {
-    let modelDir = await Embedding.retrieveModel(modelName!, cacheDir!);
+    let modelDir = await Embedding.retrieveModel(modelName, cacheDir, showDownloadProgress);
     let tokenizerPath = path.join(modelDir.toString(), "tokenizer.json");
     if (!fs.existsSync(tokenizerPath)) {
       throw new Error(`Tokenizer file not found at ${tokenizerPath}`);

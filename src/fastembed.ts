@@ -61,7 +61,7 @@ function create3DArray(
 
 abstract class Embedding {
   // @ts-ignore
-  abstract embed(texts: string[], batchSize?: number);
+  async abstract *embed(texts: string[], batchSize?: number): AsyncGenerator<number[][], void, unknown>;
 
   private static async downloadFileFromGCS(
     url: string,
@@ -187,13 +187,13 @@ abstract class Embedding {
     return modelDir;
   }
 
-  async *passageEmbed(texts: string[], batchSize: number = 256) {
+  passageEmbed(texts: string[], batchSize: number = 256) {
     texts = texts.map((text) => `passage: ${text}`);
-    yield this.embed(texts, batchSize);
+    return this.embed(texts, batchSize);
   }
 
   async queryEmbed(query: string) {
-    return this.embed([`query: ${query}`]);
+    return (await this.embed([`query: ${query}`]).next()).value!;
   }
 }
 
@@ -208,7 +208,7 @@ export class FlagEmbedding extends Embedding {
     modelName = EmbeddingModel.BGESmallEN,
     executionProviders = [ExecutionProvider.CPU],
     maxLength = 512,
-    cacheDir = path.join(__dirname, "local_cache"),
+    cacheDir = "local_cache",
   }: Partial<InitOptions> = {}) {
     let modelDir = await Embedding.retrieveModel(modelName!, cacheDir!);
     let tokenizerPath = path.join(modelDir.toString(), "tokenizer.json");

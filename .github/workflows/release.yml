@@ -1,0 +1,46 @@
+name: Semantic Release
+on:
+  push:
+    branches:
+      - main
+      - beta
+  workflow_dispatch:
+  
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+          contents: write # to be able to publish a GitHub release
+          issues: write # to be able to comment on released issues
+          pull-requests: write # to be able to comment on released pull requests
+          id-token: write # to enable use of OIDC for npm provenance
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: "🔧 setup Bun"
+        uses: oven-sh/setup-bun@v1
+
+      - name: "📦 install dependencies"
+        run: bun install
+
+      - name: "Semantic release🚀"
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GIT_COMMITTER_NAME: "Anush008"
+          GIT_COMMITTER_EMAIL: "46051506+Anush008@users.noreply.github.com"
+        uses: docker://ghcr.io/open-sauced/release:2.4.0
+  
+      - name: "echo outputs"
+        run: |
+          echo "RELEASE_TAG: ${{ env.RELEASE_TAG }}"
+          echo "RELEASE_VERSION: ${{ env.RELEASE_VERSION }}"
+          echo "outputs.release-tag: ${{ steps.release.outputs.release-tag }}"
+          echo "outputs.release-version: ${{ steps.release.outputs.release-version }}"
+      

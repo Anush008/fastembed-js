@@ -1,0 +1,39 @@
+{
+  "name": "fastembed",
+  "version": "1.0.0",
+  "description": "NodeJS implementation of @Qdrant/fastembed",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/Anush008/fastembed/LICENSE"
+    }
+  ],
+  "publishConfig": {
+    "provenance": true
+  },
+  "repository": "https://github.com/Anush008/fastembed",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "prepublishOnly": "npm run tsc"
+  },
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "files": [
+    "lib/"
+  ],
+  "keywords": ["embeddings", "fastembed", "onnxruntime", "semantic", "search"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/progress": "^2.0.5",
+    "@types/tar": "^6.1.6",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@anush008/tokenizers": "^0.0.0",
+    "onnxruntime-node": "^1.15.1",
+    "progress": "^2.0.3",
+    "tar": "^6.2.0"
+  }
+}

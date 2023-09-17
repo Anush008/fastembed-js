@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.4.3](https://github.com/Anush008/fastembed/compare/v1.4.2...v1.4.3) (2023-09-17)
+
+
+### 🔁 Continuous Integration
+
+* parallel test runners ([c31aa85](https://github.com/Anush008/fastembed/commit/c31aa8575c2b40bf07539196ca8daa1ba4b2e630))
+
 ## [1.4.2](https://github.com/Anush008/fastembed/compare/v1.4.1...v1.4.2) (2023-09-17)
 
 

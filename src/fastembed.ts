@@ -205,7 +205,7 @@ export class FlagEmbedding extends Embedding {
     super();
   }
   static async init({
-    modelName = EmbeddingModel.AllMiniLML6V2,
+    modelName = EmbeddingModel.BGESmallEN,
     executionProviders = [ExecutionProvider.CPU],
     maxLength = 512,
     cacheDir = path.join(__dirname, "local_cache"),

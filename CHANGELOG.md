@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.4.0](https://github.com/Anush008/fastembed/compare/v1.3.0...v1.4.0) (2023-09-17)
+
+
+### 📝 Documentation
+
+* Update available models README.md ([f5c8e89](https://github.com/Anush008/fastembed/commit/f5c8e89e216a3b6b540472ff505148de6620bfa6))
+
 ## [1.3.0](https://github.com/Anush008/fastembed/compare/v1.2.0...v1.3.0) (2023-09-17)
 
 

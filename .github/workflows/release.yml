@@ -9,8 +9,26 @@ on:
 env:
   CARGO_TERM_COLOR: always
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: "🔧 setup Bun"
+        uses: oven-sh/setup-bun@v1
+
+      - name: "📦 install dependencies"
+        run: bun install
+        
+      - name: "Run Vitest"
+        run: bun run test
+        
   release:
     runs-on: ubuntu-latest
+    needs: [test]
     permissions:
           contents: write # to be able to publish a GitHub release
           issues: write # to be able to comment on released issues
@@ -43,4 +61,3 @@ jobs:
           echo "RELEASE_VERSION: ${{ env.RELEASE_VERSION }}"
           echo "outputs.release-tag: ${{ steps.release.outputs.release-tag }}"
           echo "outputs.release-version: ${{ steps.release.outputs.release-version }}"
-      

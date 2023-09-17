@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.4.1](https://github.com/Anush008/fastembed/compare/v1.4.0...v1.4.1) (2023-09-17)
+
+
+### 🐛 Bug Fixes
+
+* pasage, query declarations ([eee1395](https://github.com/Anush008/fastembed/commit/eee1395a213dbd295924613d2de7175ad2826790))
+
 ## [1.4.0](https://github.com/Anush008/fastembed/compare/v1.3.0...v1.4.0) (2023-09-17)
 
 

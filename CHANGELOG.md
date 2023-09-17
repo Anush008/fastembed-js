@@ -5,6 +5,18 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.2.0](https://github.com/Anush008/fastembed/compare/v1.1.0...v1.2.0) (2023-09-17)
+
+
+### 🔁 Continuous Integration
+
+* GH actions bot creds ([8734e3a](https://github.com/Anush008/fastembed/commit/8734e3a061883e3561f242da3ed1c87067b7b5ad))
+
+
+### 📝 Documentation
+
+* Update README.md ([5cfdb07](https://github.com/Anush008/fastembed/commit/5cfdb07887cc41a8d5c78ae84e4d9fd3a9ed9a57))
+
 ## [1.1.0](https://github.com/Anush008/fastembed/compare/v1.0.0...v1.1.0) (2023-09-17)
 
 

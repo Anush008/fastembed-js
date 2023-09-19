@@ -37,16 +37,16 @@ const embeddingModel = await FlagEmbedding.init({
 
 let documents = [
     "passage: Hello, World!",
-    "query: Hello, World!", // these are two different embedding
+    "query: Hello, World!",
     "passage: This is an example passage.",
-    //# You can leave out the prefix but it's recommended
+    // You can leave out the prefix but it's recommended
     "fastembed-js is licensed under MIT" 
 ];
 
 const embeddings = embeddingModel.embed(documents, 2); //Optional batch size. Defaults to 256
 
 for await (const batch of embeddings) {
-    // batch is list of Float32 embeddings(number[][])
+    // batch is list of Float32 embeddings(number[][]) with length 2
     console.log(batch);
 }
 
@@ -54,10 +54,10 @@ for await (const batch of embeddings) {
 
 #### Supports passage and query embeddings for more accurate results
 ```ts
-const embeddings = embeddingModel.passageEmbed(listOfLongTexts, 2); //Optional batch size. Defaults to 256
+const embeddings = embeddingModel.passageEmbed(listOfLongTexts, 10); //Optional batch size. Defaults to 256
 
 for await (const batch of embeddings) {
-    // batch is list of Float32 passage embeddings(number[][])
+    // batch is list of Float32 passage embeddings(number[][]) with length 10
     console.log(batch);
 }
 

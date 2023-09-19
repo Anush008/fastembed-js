@@ -46,9 +46,23 @@ let documents = [
 const embeddings = embeddingModel.embed(documents, 2); //Optional batch size. Defaults to 256
 
 for await (const batch of embeddings) {
-    // batch is list of Float32 embeddings
+    // batch is list of Float32 embeddings(number[][])
     console.log(batch);
 }
+
+```
+
+#### Supports passage and query embeddings for more accurate results
+```ts
+const embeddings = embeddingModel.passageEmbed(listOfLongTexts, 2); //Optional batch size. Defaults to 256
+
+for await (const batch of embeddings) {
+    // batch is list of Float32 passage embeddings(number[][])
+    console.log(batch);
+}
+
+const queryEmbeddings: number[] = await embeddingModel.queryEmbed(userQuery);
+console.log(queryEmbeddings)
 
 ```
 

@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.5.0](https://github.com/Anush008/fastembed/compare/v1.4.3...v1.5.0) (2023-09-19)
+
+
+### 📝 Documentation
+
+* update README.md with query and passage embeddings ([129aca3](https://github.com/Anush008/fastembed/commit/129aca386e7ba5d0a1974798e124c57bf1aa4adf))
+
 ## [1.4.3](https://github.com/Anush008/fastembed/compare/v1.4.2...v1.4.3) (2023-09-17)
 
 

@@ -246,8 +246,6 @@ export class FlagEmbedding extends Embedding {
         batchTexts.map((textString) => this.tokenizer.encode(textString))
       );
 
-      const maxLength = encodedTexts[0].getIds().length;
-
       const idsArray: bigint[][] = [];
       const maskArray: bigint[][] = [];
       const typeIdsArray: bigint[][] = [];
@@ -262,6 +260,8 @@ export class FlagEmbedding extends Embedding {
         typeIdsArray.push(typeIds);
       });
 
+      const maxLength = idsArray.reduce((max, arr) => Math.max(max, arr.length), 0);
+      
       const batchInputIds = new ort.Tensor(
         "int64",
         idsArray.flat() as unknown as number[],

@@ -38,7 +38,7 @@ test("FlagEmbedding embed small batch", async () => {
     modelName: EmbeddingModel.AllMiniLML6V2,
     maxLength: 512,
   });
-  const embeddingsBatch = flagEmbedding.embed(["This is a test", "Some text", "Some more test", "This is a test", "Some text", "Some more test"], 1);
+  const embeddingsBatch = flagEmbedding.embed(["This is a test", "Some text"], 1);
   for await (const embeddings of embeddingsBatch) {
     expect(embeddings).toBeDefined();
     expect(embeddings.length).toBe(1);

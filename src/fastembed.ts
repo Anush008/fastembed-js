@@ -198,7 +198,7 @@ abstract class Embedding {
   }
 
   async queryEmbed(query: string) {
-    return (await this.embed([`query: ${query}`]).next()).value!;
+    return (await this.embed([`query: ${query}`]).next()).value![0];
   }
 }
 
@@ -289,21 +289,7 @@ export class FlagEmbedding extends Embedding {
         output.last_hidden_state.dims as number[]
       );
 
-      const embeddings = lastHiddenState.map((layer, layerIdx) => {
-        const weightedSum = layer.reduce((acc, tokenEmbedding, idx) => {
-          const attentionWeight = maskArray[layerIdx][idx];
-          return acc.map(
-            (val, i) => val + tokenEmbedding[i] * Number(attentionWeight)
-          );
-        }, new Array(layer[0].length).fill(0));
-
-        const inputMaskSum = maskArray[layerIdx].reduce(
-          (acc, attentionWeight) => acc + Number(attentionWeight),
-          0
-        );
-
-        return weightedSum.map((val) => val / (inputMaskSum + 1e-9));
-      });
+      const embeddings = lastHiddenState.map((sentence) => sentence[0]);
 
       yield embeddings.map(normalize);
     }

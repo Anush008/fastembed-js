@@ -54,7 +54,7 @@ test("FlagEmbedding queryEmbed", async () => {
   });
   const embeddings = await flagEmbedding.queryEmbed("This is a test");
   expect(embeddings).toBeDefined();
-  expect(embeddings.length).toBe(1);
+  expect(embeddings.length).toBe(384);
 });
 
 test("FlagEmbedding passageEmbed", async () => {

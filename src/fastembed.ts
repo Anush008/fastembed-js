@@ -260,7 +260,7 @@ export class FlagEmbedding extends Embedding {
         typeIdsArray.push(typeIds);
       });
 
-      const maxLength = idsArray.reduce((max, arr) => Math.max(max, arr.length), 0);
+      const maxLength = idsArray[0].length;
       
       const batchInputIds = new ort.Tensor(
         "int64",

@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.6.1](https://github.com/Anush008/fastembed/compare/v1.6.0...v1.6.1) (2023-09-19)
+
+
+### 🔁 Continuous Integration
+
+* workflow_dispatch only ([544afcb](https://github.com/Anush008/fastembed/commit/544afcbe0652f53435ee40b74369ad0819c47e28))
+
 ## [1.6.0](https://github.com/Anush008/fastembed/compare/v1.5.1...v1.6.0) (2023-09-19)
 
 

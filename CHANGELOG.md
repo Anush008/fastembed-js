@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.5.1](https://github.com/Anush008/fastembed/compare/v1.5.0...v1.5.1) (2023-09-19)
+
+
+### 🐛 Bug Fixes
+
+* max ids length ([9ae4d6a](https://github.com/Anush008/fastembed/commit/9ae4d6a86289e4476bdf6c1a1019e5ecfe458d38))
+
 ## [1.5.0](https://github.com/Anush008/fastembed/compare/v1.4.3...v1.5.0) (2023-09-19)
 
 

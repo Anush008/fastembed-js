@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.6.3](https://github.com/Anush008/fastembed/compare/v1.6.2...v1.6.3) (2023-10-01)
+
+
+### 🔁 Continuous Integration
+
+* sem release push ([62ce93c](https://github.com/Anush008/fastembed/commit/62ce93c9dc9b05e365c0c545faf64830630c7d7c))
+
 ## [1.6.2](https://github.com/Anush008/fastembed/compare/v1.6.1...v1.6.2) (2023-10-01)
 
 

@@ -3,14 +3,15 @@ import { FlagEmbedding, EmbeddingModel } from "../src"
 
 test('Init EmbeddingModel', async () => {
     const model = await FlagEmbedding.init({
-        model: EmbeddingModel.BGEBaseEN
+        model: EmbeddingModel.MLE5Large
     });
     expect(model).toBeDefined();
 });
 
 test("FlagEmbedding embed", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.BGEBaseEN,
+    model: EmbeddingModel.MLE5Large,
+
     maxLength: 512,
   });
   const embeddings = (await flagEmbedding.embed(["This is a test"]).next())
@@ -21,7 +22,7 @@ test("FlagEmbedding embed", async () => {
 
 test("FlagEmbedding embed batch", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.BGEBaseEN,
+    model: EmbeddingModel.MLE5Large,
 
     maxLength: 512,
   });
@@ -29,36 +30,36 @@ test("FlagEmbedding embed batch", async () => {
   for await (const embeddings of embeddingsBatch) {
     expect(embeddings).toBeDefined();
     expect(embeddings.length).toBe(6);
-    expect(embeddings[0].length).toBe(768);
+    expect(embeddings[0].length).toBe(1024);
   }
 });
 
-test("FlagEmbedding embed Base batch", async () => {
+test("FlagEmbedding embed small batch", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.BGEBaseEN,
+    model: EmbeddingModel.MLE5Large,
     maxLength: 512,
   });
   const embeddingsBatch = flagEmbedding.embed(["This is a test", "Some text", "Some more test", "This is a test", "Some text", "Some more test"], 1);
   for await (const embeddings of embeddingsBatch) {
     expect(embeddings).toBeDefined();
     expect(embeddings.length).toBe(1);
-    expect(embeddings[0].length).toBe(768);
+    expect(embeddings[0].length).toBe(1024);
   }
 });
 
 test("FlagEmbedding queryEmbed", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.BGEBaseEN,
+    model: EmbeddingModel.MLE5Large,
     maxLength: 512,
   });
   const embeddings = await flagEmbedding.queryEmbed("This is a test");
   expect(embeddings).toBeDefined();
-  expect(embeddings.length).toBe(768);
+  expect(embeddings.length).toBe(1024);
 });
 
 test("FlagEmbedding passageEmbed", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.BGEBaseEN,
+    model: EmbeddingModel.MLE5Large,
 
     maxLength: 512,
   });

@@ -3,14 +3,14 @@ import { FlagEmbedding, EmbeddingModel } from "../src"
 
 test('Init EmbeddingModel', async () => {
     const model = await FlagEmbedding.init({
-        modelName: EmbeddingModel.AllMiniLML6V2
+        model: EmbeddingModel.AllMiniLML6V2
     });
     expect(model).toBeDefined();
 });
 
 test("FlagEmbedding embed", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    modelName: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.AllMiniLML6V2,
     maxLength: 512,
   });
   const embeddings = (await flagEmbedding.embed(["This is a test"]).next())
@@ -21,7 +21,7 @@ test("FlagEmbedding embed", async () => {
 
 test("FlagEmbedding embed batch", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    modelName: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.AllMiniLML6V2,
 
     maxLength: 512,
   });
@@ -35,7 +35,7 @@ test("FlagEmbedding embed batch", async () => {
 
 test("FlagEmbedding embed small batch", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    modelName: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.AllMiniLML6V2,
     maxLength: 512,
   });
   const embeddingsBatch = flagEmbedding.embed(["This is a test", "Some text"], 1);
@@ -48,7 +48,7 @@ test("FlagEmbedding embed small batch", async () => {
 
 test("FlagEmbedding queryEmbed", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    modelName: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.AllMiniLML6V2,
     maxLength: 512,
   });
   const embeddings = await flagEmbedding.queryEmbed("This is a test");
@@ -58,7 +58,7 @@ test("FlagEmbedding queryEmbed", async () => {
 
 test("FlagEmbedding passageEmbed", async () => {
   const flagEmbedding = await FlagEmbedding.init({
-    modelName: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.AllMiniLML6V2,
 
     maxLength: 512,
   });

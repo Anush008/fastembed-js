@@ -4,6 +4,7 @@ import path from "path";
 import Progress from "progress";
 import tar from "tar";
 import { Tokenizer } from "@anush008/tokenizers";
+// @ts-ignore
 import * as ort from "onnxruntime-node";
 
 export enum ExecutionProvider {
@@ -15,27 +16,37 @@ export enum ExecutionProvider {
 }
 
 export enum EmbeddingModel {
-  AllMiniLML6V2 = "sentence-transformers/all-MiniLM-L6-v2",
-  BGEBaseEN = "BAAI/bge-base-en",
-  BGESmallEN = "BAAI/bge-small-en",
+  AllMiniLML6V2 = "fast-all-MiniLM-L6-v2",
+  BGEBaseEN = "fast-bge-base-en",
+  BGESmallEN = "fast-bge-small-en",
+  MLE5Large = "intfloat-multilingual-e5-large",
 }
 
-export interface InitOptions {
-  modelName: EmbeddingModel;
+interface InitOptions {
+  model: EmbeddingModel;
   executionProviders: ExecutionProvider[];
   maxLength: number;
   cacheDir: string;
   showDownloadProgress: boolean;
 }
 
+interface ModelInfo {
+  model: EmbeddingModel;
+  dim: number;
+  description: string;
+}
+
 function normalize(v: number[]): number[] {
   const norm = Math.sqrt(v.reduce((acc, val) => acc + val * val, 0));
   const epsilon = 1e-12;
 
-  return v.map((val) => val / (norm + epsilon));
+  return v.map((val) => val / Math.max(norm, epsilon));
 }
 
-function getEmbeddings(data: number[], dimensions: [number, number, number]) {
+function getEmbeddings(
+  data: number[],
+  dimensions: [number, number, number]
+): number[][] {
   const [x, y, z] = dimensions;
 
   return Array.from({ length: x }, (_, index) => {
@@ -73,35 +84,78 @@ function getEmbeddings(data: number[], dimensions: [number, number, number]) {
 // }
 
 abstract class Embedding {
+  abstract listSupportedModels(): ModelInfo[];
+
   abstract embed(
     texts: string[],
     batchSize?: number
   ): AsyncGenerator<number[][], void, unknown>;
 
+  abstract passageEmbed(
+    texts: string[],
+    batchSize: number
+  ): AsyncGenerator<number[][], void, unknown>;
+
+  abstract queryEmbed(query: string): Promise<number[]>;
+}
+
+export class FlagEmbedding extends Embedding {
+  private constructor(
+    private tokenizer: Tokenizer,
+    private session: ort.InferenceSession
+  ) {
+    super();
+  }
+
+  static async init({
+    model = EmbeddingModel.BGESmallEN,
+    executionProviders = [ExecutionProvider.CPU],
+    maxLength = 512,
+    cacheDir = "local_cache",
+    showDownloadProgress = true,
+  }: Partial<InitOptions> = {}) {
+    const modelDir = await FlagEmbedding.retrieveModel(
+      model,
+      cacheDir,
+      showDownloadProgress
+    );
+    const tokenizerPath = path.join(modelDir.toString(), "tokenizer.json");
+    if (!fs.existsSync(tokenizerPath)) {
+      throw new Error(`Tokenizer file not found at ${tokenizerPath}`);
+    }
+    const modelPath = path.join(modelDir.toString(), "model_optimized.onnx");
+    if (!fs.existsSync(modelPath)) {
+      throw new Error(`Model file not found at ${modelPath}`);
+    }
+
+    const tokenizer = Tokenizer.fromFile(tokenizerPath);
+    tokenizer.setTruncation(maxLength!);
+    tokenizer.setPadding({
+      padToken: "[PAD]",
+      maxLength,
+    });
+    const session = await ort.InferenceSession.create(modelPath, {
+      executionProviders,
+      graphOptimizationLevel: "all",
+    });
+    return new FlagEmbedding(tokenizer, session);
+  }
+
   private static async downloadFileFromGCS(
-    url: string,
     outputFilePath: PathLike,
-    modelName: string,
+    model: string,
     showDownloadProgress: boolean = true
   ): Promise<PathLike> {
     if (fs.existsSync(outputFilePath)) {
       return outputFilePath;
     }
 
+    const url = `https://storage.googleapis.com/qdrant-fastembed/${model}.tar.gz`;
     const fileStream = fs.createWriteStream(outputFilePath);
 
     return new Promise<PathLike>((resolve, reject) => {
       https
         .get(url, { headers: { "User-Agent": "Mozilla/5.0" } }, (response) => {
-          if (response.statusCode === 403) {
-            reject(
-              new Error(
-                "Authentication Error: You do not have permission to access this resource."
-              )
-            );
-            return;
-          }
-
           const totalSizeInBytes = parseInt(
             response.headers["content-length"] || "0",
             10
@@ -115,7 +169,7 @@ abstract class Embedding {
 
           if (showDownloadProgress) {
             const progressBar = new Progress(
-              `Downloading ${modelName} [:bar] :percent :etas`,
+              `Downloading ${model} [:bar] :percent :etas`,
               {
                 complete: "=",
                 width: 20,
@@ -166,92 +220,28 @@ abstract class Embedding {
     }
   }
 
-  protected static async retrieveModel(
+  private static async retrieveModel(
     model: EmbeddingModel,
     cacheDir: PathLike,
     showDownloadProgress: boolean = true
   ): Promise<PathLike> {
-    if (!model.includes("/")) {
-      throw new Error(
-        "model_name must be in the format <org>/<model> e.g. BAAI/bge-base-en"
-      );
-    }
-
-    let modelName = model.split("/").pop()!;
-    let fastModelName = `fast-${modelName}`;
-
     if (!fs.existsSync(cacheDir)) {
       fs.mkdirSync(cacheDir, {
         mode: 0o777,
       });
     }
 
-    let modelDir = path.join(cacheDir.toString(), fastModelName);
+    const modelDir = path.join(cacheDir.toString(), model);
 
     if (fs.existsSync(modelDir)) {
       return modelDir;
     }
 
-    let modelTarGz = path.join(cacheDir.toString(), `${fastModelName}.tar.gz`);
-    await this.downloadFileFromGCS(
-      `https://storage.googleapis.com/qdrant-fastembed/${fastModelName}.tar.gz`,
-      modelTarGz,
-      modelName,
-      showDownloadProgress
-    );
+    const modelTarGz = path.join(cacheDir.toString(), `${model}.tar.gz`);
+    await this.downloadFileFromGCS(modelTarGz, model, showDownloadProgress);
     await this.decompressToCache(modelTarGz, cacheDir);
     fs.unlinkSync(modelTarGz);
     return modelDir;
-  }
-
-  passageEmbed(texts: string[], batchSize: number = 256) {
-    texts = texts.map((text) => `passage: ${text}`);
-    return this.embed(texts, batchSize);
-  }
-
-  async queryEmbed(query: string) {
-    return (await this.embed([`query: ${query}`]).next()).value![0];
-  }
-}
-
-export class FlagEmbedding extends Embedding {
-  private constructor(
-    private tokenizer: Tokenizer,
-    private model: ort.InferenceSession
-  ) {
-    super();
-  }
-  static async init({
-    modelName = EmbeddingModel.BGESmallEN,
-    executionProviders = [ExecutionProvider.CPU],
-    maxLength = 512,
-    cacheDir = "local_cache",
-    showDownloadProgress = true,
-  }: Partial<InitOptions> = {}) {
-    let modelDir = await Embedding.retrieveModel(
-      modelName,
-      cacheDir,
-      showDownloadProgress
-    );
-    let tokenizerPath = path.join(modelDir.toString(), "tokenizer.json");
-    if (!fs.existsSync(tokenizerPath)) {
-      throw new Error(`Tokenizer file not found at ${tokenizerPath}`);
-    }
-    let modelPath = path.join(modelDir.toString(), "model_optimized.onnx");
-    if (!fs.existsSync(modelPath)) {
-      throw new Error(`Model file not found at ${modelPath}`);
-    }
-
-    let tokenizer = Tokenizer.fromFile(tokenizerPath);
-    tokenizer.setTruncation(maxLength!);
-    tokenizer.setPadding({
-      padToken: "[PAD]",
-      maxLength,
-    });
-    let model = await ort.InferenceSession.create(modelPath, {
-      executionProviders,
-    });
-    return new FlagEmbedding(tokenizer, model);
   }
 
   async *embed(textStrings: string[], batchSize: number = 256) {
@@ -294,7 +284,7 @@ export class FlagEmbedding extends Embedding {
         [batchTexts.length, maxLength]
       );
 
-      const output = await this.model.run({
+      const output = await this.session.run({
         input_ids: batchInputIds,
         attention_mask: batchAttentionMask,
         token_type_ids: batchTokenTypeId,
@@ -321,7 +311,7 @@ export class FlagEmbedding extends Embedding {
       //     0
       //   );
 
-      //   return weightedSum.map((val) => val / (inputMaskSum + 1e-9));
+      //   return weightedSum.map((val) => val / Math.max(inputMaskSum, 1e-9));
       // });
 
       // const embeddings = lastHiddenState.map((sentence) => sentence[0]);
@@ -333,5 +323,40 @@ export class FlagEmbedding extends Embedding {
 
       yield embeddings.map(normalize);
     }
+  }
+
+  passageEmbed(texts: string[], batchSize: number = 256) {
+    texts = texts.map((text) => `passage: ${text}`);
+    return this.embed(texts, batchSize);
+  }
+
+  async queryEmbed(query: string): Promise<number[]> {
+    return (await this.embed([`query: ${query}`]).next()).value![0];
+  }
+
+  listSupportedModels(): ModelInfo[] {
+    return [
+      {
+        model: EmbeddingModel.BGESmallEN,
+        dim: 384,
+        description: "Fast and Default English model",
+      },
+      {
+        model: EmbeddingModel.BGEBaseEN,
+        dim: 768,
+        description: "Base English model",
+      },
+      {
+        model: EmbeddingModel.AllMiniLML6V2,
+        dim: 384,
+        description: "Sentence Transformer model, MiniLM-L6-v2",
+      },
+      {
+        model: EmbeddingModel.MLE5Large,
+        dim: 1024,
+        description:
+          "Multilingual model, e5-large. Recommend using this model for non-English languages",
+      },
+    ];
   }
 }

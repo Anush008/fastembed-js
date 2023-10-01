@@ -32,7 +32,7 @@ import { EmbeddingModel, FlagEmbedding } from "fastembed";
 // const { EmbeddingModel, FlagEmbedding } = require("fastembed)
 
 const embeddingModel = await FlagEmbedding.init({
-    modelName: EmbeddingModel.BGEBaseEN
+    model: EmbeddingModel.BGEBaseEN
 });
 
 let documents = [

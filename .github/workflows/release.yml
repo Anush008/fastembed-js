@@ -41,9 +41,10 @@ jobs:
       - name: "Run Vitest"
         run: bun x vitest ${{ matrix.files }}
 
+      # - name: "Upload optimized models"
       # - uses: actions/upload-artifact@v3
       #   with:
-      #     name: qdrant-models
+      #     name: qdrant-optimized-models
       #     path: local_cache/
         
   release:

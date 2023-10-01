@@ -28,26 +28,6 @@ export interface InitOptions {
   showDownloadProgress: boolean;
 }
 
-// Native JS implementation of https://github.com/qdrant/fastembed/blob/050d80ab510a3aa4561103bf57d7e23af565c889/fastembed/embedding.py#L15-L20
-// function normalize(
-//   inputArray: number[],
-//   p: number = 2.0,
-//   eps: number = 1e-12
-// ): number[] {
-//   // Calculate the Lp norm of the input array
-//   const norm = Math.sqrt(
-//     inputArray.reduce((acc, val) => acc + Math.pow(Math.abs(val), p), 0)
-//   );
-
-//   // Avoid division by zero
-//   const maxNorm = Math.max(norm, eps);
-
-//   // Normalize the input array and return it
-//   const normalizedArray = inputArray.map((val) => val / maxNorm);
-
-//   return normalizedArray;
-// }
-
 function normalize(v: number[]): number[] {
   const norm = Math.sqrt(v.reduce((acc, val) => acc + val * val, 0));
   const epsilon = 1e-12;

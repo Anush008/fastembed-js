@@ -1,6 +1,11 @@
 name: Semantic Release
 on:
   workflow_dispatch:
+  
+  push:
+    branches:
+      - main
+      - beta
 
 jobs:
   prepare-matrix:

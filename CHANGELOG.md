@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.6.2](https://github.com/Anush008/fastembed/compare/v1.6.1...v1.6.2) (2023-10-01)
+
+
+### 🧑‍💻 Code Refactoring
+
+* No attention pooling ([1be33c7](https://github.com/Anush008/fastembed/commit/1be33c70054cf6a3eeed98171d61ce39e013ff8d))
+
 ## [1.6.1](https://github.com/Anush008/fastembed/compare/v1.6.0...v1.6.1) (2023-09-19)
 
 

@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.7.0](https://github.com/Anush008/fastembed/compare/v1.6.3...v1.7.0) (2023-10-01)
+
+
+### 🍕 Features
+
+* intfloat-multilingual-e5-large, list models() ([ae98d84](https://github.com/Anush008/fastembed/commit/ae98d8418f169f723679013bb288a2d42cec7e5f))
+
 ## [1.6.3](https://github.com/Anush008/fastembed/compare/v1.6.2...v1.6.3) (2023-10-01)
 
 

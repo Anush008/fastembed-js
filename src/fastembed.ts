@@ -28,6 +28,26 @@ export interface InitOptions {
   showDownloadProgress: boolean;
 }
 
+// Native JS implementation of https://github.com/qdrant/fastembed/blob/050d80ab510a3aa4561103bf57d7e23af565c889/fastembed/embedding.py#L15-L20
+// function normalize(
+//   inputArray: number[],
+//   p: number = 2.0,
+//   eps: number = 1e-12
+// ): number[] {
+//   // Calculate the Lp norm of the input array
+//   const norm = Math.sqrt(
+//     inputArray.reduce((acc, val) => acc + Math.pow(Math.abs(val), p), 0)
+//   );
+
+//   // Avoid division by zero
+//   const maxNorm = Math.max(norm, eps);
+
+//   // Normalize the input array and return it
+//   const normalizedArray = inputArray.map((val) => val / maxNorm);
+
+//   return normalizedArray;
+// }
+
 function normalize(v: number[]): number[] {
   const norm = Math.sqrt(v.reduce((acc, val) => acc + val * val, 0));
   const epsilon = 1e-12;
@@ -35,30 +55,42 @@ function normalize(v: number[]): number[] {
   return v.map((val) => val / (norm + epsilon));
 }
 
-function create3DArray(
-  inputArray: number[],
-  dimensions: number[]
-): number[][][] {
-  const totalElements = dimensions.reduce((acc, val) => acc * val, 1);
+function getEmbeddings(data: number[], dimensions: [number, number, number]) {
+  const [x, y, z] = dimensions;
 
-  if (inputArray.length !== totalElements) {
-    throw new Error(
-      "Input array length does not match the specified dimensions."
-    );
-  }
-
-  const resultArray = Array.from({ length: dimensions[0] }, (_, i) =>
-    Array.from({ length: dimensions[1] }, (_, j) =>
-      Array.from(
-        { length: dimensions[2] },
-        (_, k) =>
-          inputArray[i * dimensions[1] * dimensions[2] + j * dimensions[2] + k]
-      )
-    )
-  );
-
-  return resultArray;
+  return Array.from({ length: x }, (_, index) => {
+    const startIndex = index * y * z;
+    const endIndex = startIndex + z;
+    return data.slice(startIndex, endIndex);
+  });
 }
+
+// Remove attention pooling
+// Ref: https://github.com/qdrant/fastembed/commit/a335c8898f11042fdb311fce2dab3acf50c23011
+// function create3DArray(
+//   inputArray: number[],
+//   dimensions: number[]
+// ): number[][][] {
+//   const totalElements = dimensions.reduce((acc, val) => acc * val, 1);
+
+//   if (inputArray.length !== totalElements) {
+//     throw new Error(
+//       "Input array length does not match the specified dimensions."
+//     );
+//   }
+
+//   const resultArray = Array.from({ length: dimensions[0] }, (_, i) =>
+//     Array.from({ length: dimensions[1] }, (_, j) =>
+//       Array.from(
+//         { length: dimensions[2] },
+//         (_, k) =>
+//           inputArray[i * dimensions[1] * dimensions[2] + j * dimensions[2] + k]
+//       )
+//     )
+//   );
+
+//   return resultArray;
+// }
 
 abstract class Embedding {
   abstract embed(
@@ -216,7 +248,11 @@ export class FlagEmbedding extends Embedding {
     cacheDir = "local_cache",
     showDownloadProgress = true,
   }: Partial<InitOptions> = {}) {
-    let modelDir = await Embedding.retrieveModel(modelName, cacheDir, showDownloadProgress);
+    let modelDir = await Embedding.retrieveModel(
+      modelName,
+      cacheDir,
+      showDownloadProgress
+    );
     let tokenizerPath = path.join(modelDir.toString(), "tokenizer.json");
     if (!fs.existsSync(tokenizerPath)) {
       throw new Error(`Tokenizer file not found at ${tokenizerPath}`);
@@ -261,7 +297,7 @@ export class FlagEmbedding extends Embedding {
       });
 
       const maxLength = idsArray[0].length;
-      
+
       const batchInputIds = new ort.Tensor(
         "int64",
         idsArray.flat() as unknown as number[],
@@ -284,26 +320,36 @@ export class FlagEmbedding extends Embedding {
         token_type_ids: batchTokenTypeId,
       });
 
-      const lastHiddenState: number[][][] = create3DArray(
+      // Remove attention pooling
+      // Ref: https://github.com/qdrant/fastembed/commit/a335c8898f11042fdb311fce2dab3acf50c23011
+
+      // const lastHiddenState: number[][][] = create3DArray(
+      //   output.last_hidden_state.data as unknown[] as number[],
+      //   output.last_hidden_state.dims as number[]
+      // );
+
+      // const embeddings = lastHiddenState.map((layer, layerIdx) => {
+      //   const weightedSum = layer.reduce((acc, tokenEmbedding, idx) => {
+      //     const attentionWeight = maskArray[layerIdx][idx];
+      //     return acc.map(
+      //       (val, i) => val + tokenEmbedding[i] * Number(attentionWeight)
+      //     );
+      //   }, new Array(layer[0].length).fill(0));
+
+      //   const inputMaskSum = maskArray[layerIdx].reduce(
+      //     (acc, attentionWeight) => acc + Number(attentionWeight),
+      //     0
+      //   );
+
+      //   return weightedSum.map((val) => val / (inputMaskSum + 1e-9));
+      // });
+
+      // const embeddings = lastHiddenState.map((sentence) => sentence[0]);
+
+      const embeddings = getEmbeddings(
         output.last_hidden_state.data as unknown[] as number[],
-        output.last_hidden_state.dims as number[]
+        output.last_hidden_state.dims as [number, number, number]
       );
-
-      const embeddings = lastHiddenState.map((layer, layerIdx) => {
-        const weightedSum = layer.reduce((acc, tokenEmbedding, idx) => {
-          const attentionWeight = maskArray[layerIdx][idx];
-          return acc.map(
-            (val, i) => val + tokenEmbedding[i] * Number(attentionWeight)
-          );
-        }, new Array(layer[0].length).fill(0));
-
-        const inputMaskSum = maskArray[layerIdx].reduce(
-          (acc, attentionWeight) => acc + Number(attentionWeight),
-          0
-        );
-
-        return weightedSum.map((val) => val / (inputMaskSum + 1e-9));
-      });
 
       yield embeddings.map(normalize);
     }

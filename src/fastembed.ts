@@ -4,7 +4,6 @@ import path from "path";
 import Progress from "progress";
 import tar from "tar";
 import { Tokenizer } from "@anush008/tokenizers";
-// @ts-ignore
 import * as ort from "onnxruntime-node";
 
 export enum ExecutionProvider {

@@ -41,10 +41,10 @@ jobs:
       - name: "Run Vitest"
         run: bun x vitest ${{ matrix.files }}
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: qdrant-models
-          path: local_cache/
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: qdrant-models
+      #     path: local_cache/
         
   release:
     runs-on: ubuntu-latest

@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.8.0](https://github.com/Anush008/fastembed-js/compare/v1.7.0...v1.8.0) (2023-10-02)
+
+
+### 📝 Documentation
+
+* Model, repo url update ([29bf2b9](https://github.com/Anush008/fastembed-js/commit/29bf2b9341a6088a87f8db792c68489d8ec23f53))
+
 ## [1.7.0](https://github.com/Anush008/fastembed/compare/v1.6.3...v1.7.0) (2023-10-01)
 
 

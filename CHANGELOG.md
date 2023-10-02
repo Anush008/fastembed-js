@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.10.0](https://github.com/Anush008/fastembed-js/compare/v1.9.0...v1.10.0) (2023-10-02)
+
+
+### 📝 Documentation
+
+* Hyperlink @Qdrant/fastembed README.md ([98abfee](https://github.com/Anush008/fastembed-js/commit/98abfee5a2d5496986161641d786361639fe7352))
+
 ## [1.9.0](https://github.com/Anush008/fastembed-js/compare/v1.8.0...v1.9.0) (2023-10-02)
 
 

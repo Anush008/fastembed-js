@@ -1,3 +1,17 @@
+# 📦 anush008/fastembed-js changelog
+
+[![conventional commits](https://img.shields.io/badge/conventional%20commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+[![semantic versioning](https://img.shields.io/badge/semantic%20versioning-2.0.0-green.svg)](https://semver.org)
+
+> All notable changes to this project will be documented in this file
+
+## [1.9.0](https://github.com/Anush008/fastembed-js/compare/v1.8.0...v1.9.0) (2023-10-02)
+
+
+### 📝 Documentation
+
+* Update README.md ([3600dc2](https://github.com/Anush008/fastembed-js/commit/3600dc21c69d2b0749d5e0e0c0c245f0caaae3e2))
+
 # 📦 anush008/fastembed changelog
 
 [![conventional commits](https://img.shields.io/badge/conventional%20commits-1.0.0-yellow.svg)](https://conventionalcommits.org)

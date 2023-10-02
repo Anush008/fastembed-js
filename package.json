@@ -5,13 +5,13 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/Anush008/fastembed/LICENSE"
+      "url": "https://github.com/Anush008/fastembed-js/LICENSE"
     }
   ],
   "publishConfig": {
     "provenance": true
   },
-  "repository": "https://github.com/Anush008/fastembed",
+  "repository": "https://github.com/Anush008/fastembed-js",
   "scripts": {
     "test": "npm run tsc && vitest",
     "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",

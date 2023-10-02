@@ -1,12 +1,16 @@
-# ⚡️ FastEmbed-JS
-
-FastEmbed-JS is a Typescript/NodeJS implementation of [@Qdrant/fastembed](https://github.com/qdrant/fastembed).
+<div align="center">
+  <h1><a href="https://www.npmjs.com/package/fastembed">FastEmbed-js</a></h1>
+  <h3>A Typescript/NodeJS implementation of @Qdrant/fastembed.</h3>
+  <a href="https://www.npmjs.com/package/fastembed"><img src="https://img.shields.io/npm/v/fastembed.svg" alt="Crates.io"></a>
+  <a href="https://github.com/Anush008/fastembed-js/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-mit-blue.svg" alt="MIT Licensed"></a>
+  <a href="https://github.com/Anush008/fastembed-js/actions/workflows/release.yml"><img src="https://github.com/Anush008/fastembed-js/actions/workflows/release.yml/badge.svg?branch=main" alt="Semantic release"></a>
+</div>
 
 * Supports CommonJS and ESM.
 * Uses [@anush008/tokenizers](https://github.com/Anush008/tokenizers) multi-arch native bindings for [@huggingface/tokenizers](https://github.com/huggingface/tokenizers).
 * Supports batch embedddings with generators.
 
-The default embedding supports "query" and "passage" prefixes for the input text. The default model is Flag Embedding, which is top of the [MTEB](https://huggingface.co/spaces/mteb/leaderboard) leaderboard.
+The default model is Flag Embedding, which is top of the [MTEB](https://huggingface.co/spaces/mteb/leaderboard) leaderboard.
 
 ## 🤖 Models
 

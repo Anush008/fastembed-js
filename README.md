@@ -86,3 +86,7 @@ It's important we justify the "fast" in FastEmbed. FastEmbed is fast because:
 ### Why accurate?
 1. Better than OpenAI Ada-002
 2. Top of the Embedding leaderboards e.g. [MTEB](https://huggingface.co/spaces/mteb/leaderboard)
+
+## © LICENSE
+
+MIT © [2023](https://github.com/Anush008/fastembed-js/blob/main/LICENSE)

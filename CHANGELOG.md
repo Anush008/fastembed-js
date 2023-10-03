@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.11.0](https://github.com/Anush008/fastembed-js/compare/v1.10.0...v1.11.0) (2023-10-03)
+
+
+### 📝 Documentation
+
+* Added license ([4aae8c2](https://github.com/Anush008/fastembed-js/commit/4aae8c23e88c2a957eed3eb9ff59eb2f4dc4918f))
+
 ## [1.10.0](https://github.com/Anush008/fastembed-js/compare/v1.9.0...v1.10.0) (2023-10-02)
 
 

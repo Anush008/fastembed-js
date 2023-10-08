@@ -13,6 +13,12 @@
 
 The default model is Flag Embedding, which is top of the [MTEB](https://huggingface.co/spaces/mteb/leaderboard) leaderboard.
 
+## 🔍 Not looking for Javascript?
+
+- Python 🐍: [fastembed](https://github.com/qdrant/fastembed)
+- Rust 🦀: [fastembed-rs](https://github.com/Anush008/fastembed-rs)
+- Go 🐳: [fastembed-go](https://github.com/Anush008/fastembed-go)
+
 ## 🤖 Models
 
 - [**BAAI/bge-base-en-v1.5**](https://huggingface.co/BAAI/bge-base-en-v1.5)

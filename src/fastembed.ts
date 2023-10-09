@@ -35,6 +35,8 @@ interface ModelInfo {
   description: string;
 }
 
+type ModelInput = Record<string, ort.Tensor>;
+
 function normalize(v: number[]): number[] {
   const norm = Math.sqrt(v.reduce((acc, val) => acc + val * val, 0));
   const epsilon = 1e-12;
@@ -101,7 +103,8 @@ abstract class Embedding {
 export class FlagEmbedding extends Embedding {
   private constructor(
     private tokenizer: Tokenizer,
-    private session: ort.InferenceSession
+    private session: ort.InferenceSession,
+    private model: EmbeddingModel
   ) {
     super();
   }
@@ -129,7 +132,7 @@ export class FlagEmbedding extends Embedding {
       executionProviders,
       graphOptimizationLevel: "all",
     });
-    return new FlagEmbedding(tokenizer, session);
+    return new FlagEmbedding(tokenizer, session, model);
   }
 
   private static loadTokenizer(
@@ -336,11 +339,18 @@ export class FlagEmbedding extends Embedding {
         [batchTexts.length, maxLength]
       );
 
-      const output = await this.session.run({
+      const inputs: ModelInput = {
         input_ids: batchInputIds,
         attention_mask: batchAttentionMask,
         token_type_ids: batchTokenTypeId,
-      });
+      };
+
+      // Exclude token_type_ids for MLE5Large
+      if(this.model === EmbeddingModel.MLE5Large) {
+        delete inputs.token_type_ids;
+      }
+
+      const output = await this.session.run(inputs);
 
       // Remove attention pooling
       // Ref: https://github.com/qdrant/fastembed/commit/a335c8898f11042fdb311fce2dab3acf50c23011

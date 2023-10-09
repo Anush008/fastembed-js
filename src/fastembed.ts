@@ -3,7 +3,7 @@ import https from "https";
 import path from "path";
 import Progress from "progress";
 import tar from "tar";
-import { Tokenizer } from "@anush008/tokenizers";
+import { AddedToken, Tokenizer } from "@anush008/tokenizers";
 import * as ort from "onnxruntime-node";
 
 export enum ExecutionProvider {
@@ -118,26 +118,79 @@ export class FlagEmbedding extends Embedding {
       cacheDir,
       showDownloadProgress
     );
-    const tokenizerPath = path.join(modelDir.toString(), "tokenizer.json");
-    if (!fs.existsSync(tokenizerPath)) {
-      throw new Error(`Tokenizer file not found at ${tokenizerPath}`);
-    }
+
+    const tokenizer = this.loadTokenizer(modelDir, maxLength);
+
     const modelPath = path.join(modelDir.toString(), "model_optimized.onnx");
     if (!fs.existsSync(modelPath)) {
       throw new Error(`Model file not found at ${modelPath}`);
     }
-
-    const tokenizer = Tokenizer.fromFile(tokenizerPath);
-    tokenizer.setTruncation(maxLength!);
-    tokenizer.setPadding({
-      padToken: "[PAD]",
-      maxLength,
-    });
     const session = await ort.InferenceSession.create(modelPath, {
       executionProviders,
       graphOptimizationLevel: "all",
     });
     return new FlagEmbedding(tokenizer, session);
+  }
+
+  private static loadTokenizer(
+    modelDir: fs.PathLike,
+    maxLength: number
+  ): Tokenizer {
+    const tokenizerPath = path.join(modelDir.toString(), "tokenizer.json");
+    if (!fs.existsSync(tokenizerPath)) {
+      throw new Error(`Tokenizer file not found at ${tokenizerPath}`);
+    }
+
+    const configPath = path.join(modelDir.toString(), "config.json");
+    if (!fs.existsSync(configPath)) {
+      throw new Error(`Config file not found at ${configPath}`);
+    }
+    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+
+    const tokenizerFilePath = path.join(
+      modelDir.toString(),
+      "tokenizer_config.json"
+    );
+    if (!fs.existsSync(tokenizerFilePath)) {
+      throw new Error(`Tokenizer file not found at ${tokenizerFilePath}`);
+    }
+    const tokenizerConfig = JSON.parse(
+      fs.readFileSync(tokenizerFilePath, "utf-8")
+    );
+    maxLength = Math.min(maxLength, tokenizerConfig["model_max_length"]);
+
+    const tokensMapPath = path.join(
+      modelDir.toString(),
+      "special_tokens_map.json"
+    );
+    if (!fs.existsSync(tokensMapPath)) {
+      throw new Error(`Tokens map file not found at ${tokensMapPath}`);
+    }
+    const tokensMap = JSON.parse(fs.readFileSync(tokensMapPath, "utf-8"));
+
+    const tokenizer = Tokenizer.fromFile(tokenizerPath);
+
+    tokenizer.setTruncation(maxLength);
+    tokenizer.setPadding({
+      maxLength,
+      padId: config["pad_token_id"],
+      padToken: tokenizerConfig["pad_token"],
+    });
+
+    for (let token of Object.values(tokensMap)) {
+      if (typeof token === "string") {
+        tokenizer.addSpecialTokens([token]);
+      } else if (isAddedTokenMap(token)) {
+        const addedToken = new AddedToken(token["content"], true, {
+          singleWord: token["single_word"],
+          leftStrip: token["lstrip"],
+          rightStrip: token["rstrip"],
+          normalized: token["normalized"],
+        });
+        tokenizer.addAddedTokens([addedToken]);
+      }
+    }
+    return tokenizer;
   }
 
   private static async downloadFileFromGCS(
@@ -358,4 +411,24 @@ export class FlagEmbedding extends Embedding {
       },
     ];
   }
+}
+
+interface AddedTokenMap {
+  content: string;
+  single_word: boolean;
+  lstrip: boolean;
+  rstrip: boolean;
+  normalized: boolean;
+}
+
+function isAddedTokenMap(token: any): token is AddedTokenMap {
+  return (
+    typeof token === "object" &&
+    token !== null &&
+    "token" in token &&
+    "single_word" in token &&
+    "rstrip" in token &&
+    "lstrip" in token &&
+    "normalized" in token
+  );
 }

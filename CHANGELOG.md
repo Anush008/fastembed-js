@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.12.2-beta.1](https://github.com/Anush008/fastembed-js/compare/v1.12.1...v1.12.2-beta.1) (2023-10-09)
+
+
+### ✅ Tests
+
+* verify canonical values ([#4](https://github.com/Anush008/fastembed-js/issues/4)) ([1cc3b57](https://github.com/Anush008/fastembed-js/commit/1cc3b572ee0e22b0a4ad967ae888f2d767417176))
+
 ## [1.12.1](https://github.com/Anush008/fastembed-js/compare/v1.12.0...v1.12.1) (2023-10-09)
 
 

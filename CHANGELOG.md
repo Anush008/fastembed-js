@@ -5,6 +5,13 @@
 
 > All notable changes to this project will be documented in this file
 
+## [1.12.1](https://github.com/Anush008/fastembed-js/compare/v1.12.0...v1.12.1) (2023-10-09)
+
+
+### 🐛 Bug Fixes
+
+* MLE5Large GCS URL transform ([#3](https://github.com/Anush008/fastembed-js/issues/3)) ([7ae5bea](https://github.com/Anush008/fastembed-js/commit/7ae5bea80983d216dd5dbb27d425718b3eae9a23))
+
 ## [1.12.0](https://github.com/Anush008/fastembed-js/compare/v1.11.0...v1.12.0) (2023-10-08)
 
 

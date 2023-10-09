@@ -210,7 +210,6 @@ export class FlagEmbedding extends Embedding {
     // The model directory name in the GCS storage is "fast-multilingual-e5-large", like the others
     if (model === EmbeddingModel.MLE5Large) {
       model = "intfloat" + model.substring(model.indexOf("-"));
-      console.log("It is:", model);
     }
     const url = `https://storage.googleapis.com/qdrant-fastembed/${model}.tar.gz`;
     const fileStream = fs.createWriteStream(outputFilePath);

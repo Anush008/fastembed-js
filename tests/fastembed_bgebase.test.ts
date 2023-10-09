@@ -68,3 +68,20 @@ test("FlagEmbedding passageEmbed", async () => {
   expect(embeddings).toBeDefined();
   expect(embeddings.length).toBe(1);
 });
+
+test("FlagEmbedding canonical values", async () => {
+  const flagEmbedding = await FlagEmbedding.init({
+    model: EmbeddingModel.BGEBaseEN,
+    maxLength: 512,
+  });
+  const expected = [
+    0.0114, 0.03722, 0.02941, 0.0123, 0.03451, 0.00876, 0.02356, 0.05414,
+    -0.0294, -0.0547,
+  ];
+
+  const embeddings = (await flagEmbedding.embed(["hello world"]).next()).value!;
+  expect(embeddings).toBeDefined();
+  for (let i = 0; i < expected.length; i++) {
+    expect(embeddings[0][i]).toBeCloseTo(expected[i], 3);
+  }
+});

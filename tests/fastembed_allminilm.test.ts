@@ -1,5 +1,5 @@
-import { expect, test } from 'vitest'
-import { FlagEmbedding, EmbeddingModel } from "../src"
+import { expect, test } from "vitest";
+import { FlagEmbedding, EmbeddingModel } from "../src";
 
 test('Init EmbeddingModel', async () => {
     const model = await FlagEmbedding.init({
@@ -69,3 +69,19 @@ test("FlagEmbedding passageEmbed", async () => {
   expect(embeddings.length).toBe(1);
 });
 
+test("FlagEmbedding canonical values", async () => {
+  const flagEmbedding = await FlagEmbedding.init({
+    model: EmbeddingModel.AllMiniLML6V2,
+    maxLength: 512,
+  });
+  const expected = [
+    0.02591, 0.00573, 0.01147, 0.03796, -0.0232, -0.0549, 0.01404, -0.0107,
+    -0.0244, -0.01822,
+  ];
+
+  const embeddings = (await flagEmbedding.embed(["hello world"]).next()).value!;
+  expect(embeddings).toBeDefined();
+  for (let i = 0; i < expected.length; i++) {
+    expect(embeddings[0][i]).toBeCloseTo(expected[i], 3);
+  }
+});

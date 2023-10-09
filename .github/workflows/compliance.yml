@@ -1,4 +1,4 @@
-name: "Compliance"
+name: "PR Compliance"
 
 on:
   pull_request_target:
@@ -11,5 +11,42 @@ permissions:
   pull-requests: write
 
 jobs:
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set matrix for test
+        id: set-matrix
+        run: echo "matrix=$(find . -name '*.test.ts' | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        files: ${{fromJson(needs.prepare-matrix.outputs.matrix)}}
+    needs:
+      - prepare-matrix
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: "🔧 setup Bun"
+        uses: oven-sh/setup-bun@v1
+
+      - name: "📦 install dependencies"
+        run: bun install
+
+      - name: "Run Vitest"
+        run: bun x vitest ${{ matrix.files }}
+
   compliance:
     uses: open-sauced/hot/.github/workflows/compliance.yml@main
+    needs: 
+      - test
+
+  

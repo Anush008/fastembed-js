@@ -75,6 +75,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GIT_COMMITTER_NAME: "github-actions[bot]"
           GIT_COMMITTER_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+          SKIP_CHANGELOG: true
         uses: docker://ghcr.io/open-sauced/release:2.4.0
   
       - name: "echo outputs"

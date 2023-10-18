@@ -17,7 +17,10 @@ export enum ExecutionProvider {
 export enum EmbeddingModel {
   AllMiniLML6V2 = "fast-all-MiniLM-L6-v2",
   BGEBaseEN = "fast-bge-base-en",
+  BGEBaseENV15 = "fast-bge-base-en-v1.5",
   BGESmallEN = "fast-bge-small-en",
+  BGESmallENV15 = "fast-bge-small-en-v1.5",
+  BGESmallZH = "fast-bge-small-zh-v1.5",
   MLE5Large = "fast-multilingual-e5-large",
 }
 
@@ -110,7 +113,7 @@ export class FlagEmbedding extends Embedding {
   }
 
   static async init({
-    model = EmbeddingModel.BGESmallEN,
+    model = EmbeddingModel.BGESmallENV15,
     executionProviders = [ExecutionProvider.CPU],
     maxLength = 512,
     cacheDir = "local_cache",
@@ -352,7 +355,7 @@ export class FlagEmbedding extends Embedding {
       };
 
       // Exclude token_type_ids for MLE5Large
-      if(this.model === EmbeddingModel.MLE5Large) {
+      if (this.model === EmbeddingModel.MLE5Large) {
         delete inputs.token_type_ids;
       }
 
@@ -407,12 +410,27 @@ export class FlagEmbedding extends Embedding {
       {
         model: EmbeddingModel.BGESmallEN,
         dim: 384,
-        description: "Fast and Default English model",
+        description: "Fast English model",
+      },
+      {
+        model: EmbeddingModel.BGESmallENV15,
+        dim: 384,
+        description: "v1.5 release of the fast, default English model",
       },
       {
         model: EmbeddingModel.BGEBaseEN,
         dim: 768,
         description: "Base English model",
+      },
+      {
+        model: EmbeddingModel.BGEBaseENV15,
+        dim: 768,
+        description: "v1.5 release of Base English model",
+      },
+      {
+        model: EmbeddingModel.BGESmallZH,
+        dim: 512,
+        description: "v1.5 release of the fast, Chinese model",
       },
       {
         model: EmbeddingModel.AllMiniLML6V2,

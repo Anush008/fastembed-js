@@ -53,7 +53,7 @@ function getEmbeddings(
 ): number[][] {
   const [x, y, z] = dimensions;
 
-  return Array.from({ length: x }, (_, index) => {
+  return new Array(x).fill(undefined).map((_, index) => {
     const startIndex = index * y * z;
     const endIndex = startIndex + z;
     return data.slice(startIndex, endIndex);

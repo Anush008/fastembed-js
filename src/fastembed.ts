@@ -208,12 +208,6 @@ export class FlagEmbedding extends Embedding {
       return outputFilePath;
     }
 
-    // The MLE5Large model URL doesn't follow the same naming convention as the other models
-    // So, we tranform "fast-multilingual-e5-large" -> "intfloat-multilingual-e5-large" in the download URL
-    // The model directory name in the GCS storage is "fast-multilingual-e5-large", like the others
-    if (model === EmbeddingModel.MLE5Large) {
-      model = "intfloat" + model.substring(model.indexOf("-"));
-    }
     const url = `https://storage.googleapis.com/qdrant-fastembed/${model}.tar.gz`;
     const fileStream = fs.createWriteStream(outputFilePath);
 

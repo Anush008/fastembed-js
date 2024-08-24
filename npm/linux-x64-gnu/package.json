@@ -1,0 +1,21 @@
+{
+  "name": "fastembed-linux-x64-gnu",
+  "version": "2.0.0",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "fastembed.linux-x64-gnu.node",
+  "files": [
+    "fastembed.linux-x64-gnu.node"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  },
+  "libc": [
+    "glibc"
+  ]
+}

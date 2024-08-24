@@ -1,45 +1,35 @@
 {
   "name": "fastembed",
-  "version": "1.14.1",
-  "description": "NodeJS implementation of @Qdrant/fastembed",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/Anush008/fastembed-js/LICENSE"
+  "version": "2.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "fastembed",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin"
+      ]
     }
-  ],
-  "publishConfig": {
-    "provenance": true
   },
-  "repository": "https://github.com/Anush008/fastembed-js",
-  "scripts": {
-    "test": "npm run tsc && vitest",
-    "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
-    "prepublishOnly": "npm run tsc"
-  },
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
-  "files": [
-    "lib/"
-  ],
-  "keywords": [
-    "embeddings",
-    "fastembed",
-    "onnxruntime",
-    "semantic",
-    "search"
-  ],
-  "author": "Anush008 <anushshetty90@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
-    "@types/progress": "^2.0.5",
-    "@types/tar": "^6.1.6",
-    "typescript": "^5.2.2",
-    "vitest": "^0.34.4"
+    "@napi-rs/cli": "^2.18.4",
+    "ava": "^6.0.1"
   },
-  "dependencies": {
-    "@anush008/tokenizers": "^0.0.0",
-    "onnxruntime-node": "1.15.1",
-    "progress": "^2.0.3",
-    "tar": "^6.2.0"
-  }
+  "ava": {
+    "timeout": "3m"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "ava",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "packageManager": "yarn@4.4.0"
 }

@@ -106,6 +106,19 @@ jobs:
 
           cd ..
         shell: cmd
+      - name: Cargo build with ORT_LIB_LOCATION for Windows
+        run: |
+          echo Setting ORT_LIB_LOCATION environment variable...
+          set ORT_LIB_LOCATION=%CD%\onnxruntime\build\Windows\Release
+          echo ORT_LIB_LOCATION is set to: %ORT_LIB_LOCATION%
+
+          echo Verifying ORT_LIB_LOCATION directory contents:
+          dir %ORT_LIB_LOCATION%
+
+          echo Running build command from matrix.settings.build:
+          cargo build
+        shell: cmd
+
       - name: Build with ORT_LIB_LOCATION for Windows
         run: |
           echo Setting ORT_LIB_LOCATION environment variable...
@@ -118,7 +131,6 @@ jobs:
           echo Running build command from matrix.settings.build:
           ${{ matrix.settings.build }}
         shell: cmd
-
 
         if: matrix.settings.host == 'windows-latest'
       - name: Build for MacOS

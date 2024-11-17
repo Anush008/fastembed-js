@@ -109,10 +109,6 @@ jobs:
           echo Verifying ORT_LIB_LOCATION directory contents:
           dir %ORT_LIB_LOCATION%
 
-          echo Adding Rust toolchain for Windows...
-          rustup target add x86_64-pc-windows-msvc
-          rustup default x86_64-pc-windows-msvc
-
           echo Running build command from matrix.settings.build:
           ${{ matrix.settings.build }}
         shell: cmd

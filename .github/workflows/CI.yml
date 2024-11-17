@@ -84,7 +84,7 @@ jobs:
             github.workspace }}:/build -w /build
           run: '${{ matrix.settings.build }}'
       - name: Compile ONNX Runtime for Windows
-        if: matrix.settings.host == 'windows-latest'
+        if: matrix.settings.host == 'windows-latest' && steps.cache-build-restore.outputs.cache-hit != 'true'
         run: >
           git clone https://github.com/microsoft/onnxruntime --recursive
           --branch v1.19.2 --single-branch --depth 1

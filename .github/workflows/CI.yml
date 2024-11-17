@@ -42,6 +42,10 @@ jobs:
     runs-on: '${{ matrix.settings.host }}'
     steps:
       - uses: actions/checkout@v4
+      - name: Print Visual Studio version
+        run: "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -property catalog_productDisplayVersion
+        if: matrix.settings.host == 'windows-latest'
+        shell: cmd
       - name: Restore Builds
         id: cache-build-restore
         uses: actions/cache/restore@v4

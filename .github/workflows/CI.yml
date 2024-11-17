@@ -85,24 +85,38 @@ jobs:
           run: '${{ matrix.settings.build }}'
       - name: Compile ONNX Runtime for Windows
         if: matrix.settings.host == 'windows-latest' && steps.cache-build-restore.outputs.cache-hit != 'true'
-        run: >
-          git clone https://github.com/microsoft/onnxruntime --recursive
-          --branch v1.19.2 --single-branch --depth 1
+        run: |
+          echo Cloning ONNX Runtime repository...
+          git clone https://github.com/microsoft/onnxruntime --recursive --branch v1.19.2 --single-branch --depth 1
 
+          echo Navigating to ONNX Runtime folder...
           cd onnxruntime
 
-          .\build.bat --update --build --config Release --parallel
-          --compile_no_warning_as_error --skip_submodule_sync
+          echo Starting ONNX Runtime build...
+          .\build.bat --update --build --config Release --parallel --compile_no_warning_as_error --skip_submodule_sync
+
+          echo Build completed. Listing build directory contents:
+          dir build\Windows\Release
 
           cd ..
+        shell: cmd
       - name: Build with ORT_LIB_LOCATION for Windows
         run: |
+          echo Setting ORT_LIB_LOCATION environment variable...
           set ORT_LIB_LOCATION=%CD%\onnxruntime\build\Windows\Release
           echo ORT_LIB_LOCATION is set to: %ORT_LIB_LOCATION%
+
+          echo Verifying ORT_LIB_LOCATION directory contents:
+          dir %ORT_LIB_LOCATION%
+
+          echo Adding Rust toolchain for Windows...
           rustup target add x86_64-pc-windows-msvc
           rustup default x86_64-pc-windows-msvc
+
+          echo Running build command from matrix.settings.build:
           ${{ matrix.settings.build }}
         shell: cmd
+
 
         if: matrix.settings.host == 'windows-latest'
       - name: Build for MacOS

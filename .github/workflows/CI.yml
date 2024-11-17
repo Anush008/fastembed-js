@@ -102,6 +102,7 @@ jobs:
           rustup target add x86_64-pc-windows-msvc
           rustup default x86_64-pc-windows-msvc
           ${{ matrix.settings.build }}
+        shell: cmd
 
         if: matrix.settings.host == 'windows-latest'
       - name: Build for MacOS

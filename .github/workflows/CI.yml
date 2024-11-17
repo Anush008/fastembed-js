@@ -46,7 +46,7 @@ jobs:
         id: cache-build-restore
         uses: actions/cache/restore@v4
         with:
-          key: '${{ runner.os }}-cargo-${{ hashFiles(''**/Cargo.lock'') }}'
+          key: '${{ runner.os }}-cargox-${{ hashFiles(''**/Cargo.lock'') }}'
           path: |
             ~/.cargo/bin/
             ~/.cargo/registry/index/
@@ -54,7 +54,7 @@ jobs:
             ~/.cargo/git/db/
             ~/.cache/ort.pyke.io
             target/
-            /onnxruntime/build/Windows/
+            onnxruntime/build/Windows/Release/
       - name: Setup node
         uses: actions/setup-node@v4
         if: '${{ !matrix.settings.docker }}'
@@ -142,7 +142,7 @@ jobs:
             ~/.cargo/git/db/
             ~/.cache/ort.pyke.io
             target/
-            /onnxruntime/build/Windows/
+            onnxruntime/build/Windows/Release/
   test-macOS-windows-binding:
     name: 'Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}'
     needs:

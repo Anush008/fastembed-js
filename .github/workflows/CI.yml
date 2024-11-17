@@ -43,7 +43,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Print Visual Studio version
-        run: "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -property catalog_productDisplayVersion
+        id: print-vs-version
+        run: |
+          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -property catalog_productDisplayVersion
         if: matrix.settings.host == 'windows-latest'
         shell: cmd
       - name: Restore Builds

@@ -98,7 +98,10 @@ jobs:
       - name: Build with ORT_LIB_LOCATION for Windows
         run: |
           set ORT_LIB_LOCATION=%CD%\onnxruntime\build\Windows\Release
+          echo ORT_LIB_LOCATION is set to: %ORT_LIB_LOCATION%
+          rustup default stable-x86_64-pc-windows-gnu
           ${{ matrix.settings.build }}
+
         if: matrix.settings.host == 'windows-latest'
       - name: Build for MacOS
         run: '${{ matrix.settings.build }}'

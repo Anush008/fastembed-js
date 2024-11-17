@@ -107,6 +107,7 @@ jobs:
           echo ORT_LIB_LOCATION is set to: %ORT_LIB_LOCATION%
 
           echo Verifying ORT_LIB_LOCATION directory contents:
+          dir %CD%\onnxruntime\build
           dir %ORT_LIB_LOCATION%
 
           echo Adding Rust toolchain for Windows...

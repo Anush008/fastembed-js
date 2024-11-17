@@ -7,8 +7,8 @@ version = "0.0.0"
 crate-type = ["cdylib"]
 
 [dependencies]
-anyhow = "<1.0.49"
-fastembed = { git = "https://github.com/Anush008/fastembed-rs", branch = "file-f" }
+anyhow = { version = "1" }
+fastembed = "4.1.0"
 napi = { version = "2.12.2", default-features = false, features = ["napi4"] }
 napi-derive = "2.12.2"
 openssl = { version = "=0.10.66", features = ["vendored"] }  # CI fails for Windows without this

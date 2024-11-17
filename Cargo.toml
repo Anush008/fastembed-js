@@ -8,10 +8,15 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = { version = "1" }
-fastembed = "4.1.0"
 napi = { version = "2.12.2", default-features = false, features = ["napi4"] }
 napi-derive = "2.12.2"
 openssl = { version = "=0.10.66", features = ["vendored"] }  # CI fails for Windows without this
+
+[target.'cfg(windows)'.dependencies]
+fastembed = {version = "4.1.0", features = ["online"], default-features = false}
+
+[target.'cfg(not(windows))'.dependencies]
+fastembed = {version = "4.1.0"}
 
 [build-dependencies]
 napi-build = "2.0.1"

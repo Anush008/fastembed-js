@@ -37,7 +37,7 @@
     "vitest": "^0.34.4"
   },
   "dependencies": {
-    "@anush008/tokenizers": "^0.0.0",
+    "@anush008/tokenizers": "github:meta-introspector/arm64-tokenizers#feature/arm64",
     "onnxruntime-node": "1.15.1",
     "progress": "^2.0.3",
     "tar": "^6.2.0"

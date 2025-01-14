@@ -12,6 +12,7 @@ env:
     PROJECT: fastembed-js
     ECR_REPOSITORY: $env.PROJECT
     APP_NAME: $env.PROJECT
+    SESSION_APP_NAME: fastembed-docker
 
 jobs:
   
@@ -28,7 +29,7 @@ jobs:
             uses: meta-introspector/configure-aws-credentials@v4
             with:
               aws-region: ${{ secrets.AWS_REGION || 'us-east-2'}}
-              role-session-name: github-actions-${{ env.APP_NAME }}
+              role-session-name: github-actions-${{ env.SESSION_APP_NAME }}
               # FIXME hard coded
               role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID || '767503528736' }}:role/github
 

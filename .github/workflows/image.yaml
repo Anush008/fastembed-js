@@ -9,9 +9,8 @@ on:
 env:
     REGISTRY: ghcr.io
     IMAGE_NAME: ${{ github.repository }}
-    PROJECT: fastembed-js
-    ECR_REPOSITORY: fastembed-js
-    APP_NAME: fastembed-js
+    PROJECT: fastembed
+    ECR_REPOSITORY: fastembed
     SESSION_APP_NAME: fastembed
 
 jobs:

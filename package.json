@@ -9,10 +9,24 @@
     "semantic",
     "search"
   ],
-  "repository": "https://github.com/Anush008/fastembed-js",
+  "repository": "github:Anush008/fastembed-js",
+  "license": "MIT",
   "author": "Anush008 <anushshetty90@gmail.com>",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./lib/esm/index.d.ts",
+        "default": "./lib/esm/index.js"
+      },
+      "require": {
+        "types": "./lib/cjs/index.d.ts",
+        "default": "./lib/cjs/index.js"
+      }
+    }
+  },
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
+  "types": "./lib/cjs/index.d.ts",
   "files": [
     "lib/"
   ],
@@ -35,11 +49,5 @@
   },
   "publishConfig": {
     "provenance": true
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/Anush008/fastembed-js/LICENSE"
-    }
-  ]
+  }
 }

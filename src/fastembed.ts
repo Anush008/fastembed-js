@@ -127,7 +127,13 @@ export class FlagEmbedding extends Embedding {
 
     const tokenizer = this.loadTokenizer(modelDir, maxLength);
 
-    const modelPath = path.join(modelDir.toString(), "model_optimized.onnx");
+    const modelPath = path.join(
+      modelDir.toString(),
+      model === EmbeddingModel.MLE5Large ||
+        model === EmbeddingModel.AllMiniLML6V2
+        ? "model.onnx"
+        : "model_optimized.onnx",
+    );
     if (!fs.existsSync(modelPath)) {
       throw new Error(`Model file not found at ${modelPath}`);
     }
@@ -208,11 +214,11 @@ export class FlagEmbedding extends Embedding {
       return outputFilePath;
     }
 
-    // The MLE5Large model URL doesn't follow the same naming convention as the other models
-    // So, we tranform "fast-multilingual-e5-large" -> "intfloat-multilingual-e5-large" in the download URL
-    // The model directory name in the GCS storage is "fast-multilingual-e5-large", like the others
-    if (model === EmbeddingModel.MLE5Large) {
-      model = "intfloat" + model.substring(model.indexOf("-"));
+    // The AllMiniLML6V2 model URL doesn't follow the same naming convention as the other models
+    // So, we transform "fast-all-MiniLM-L6-v2" -> "sentence-transformers-all-MiniLM-L6-v2" in the download URL
+    // The model directory name in the GCS storage remains "fast-all-MiniLM-L6-v2"
+    if (model === EmbeddingModel.AllMiniLML6V2) {
+      model = "sentence-transformers" + model.substring(model.indexOf("-"));
     }
     const url = `https://storage.googleapis.com/qdrant-fastembed/${model}.tar.gz`;
     const fileStream = fs.createWriteStream(outputFilePath);

@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@anush008/tokenizers": "^0.0.0",
-    "onnxruntime-node": "1.15.1",
+    "onnxruntime-node": "1.21.0",
     "progress": "^2.0.3",
     "tar": "^6.2.0"
   },

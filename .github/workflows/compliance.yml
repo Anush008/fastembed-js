@@ -1,7 +1,7 @@
 name: "PR Compliance"
 
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
@@ -17,7 +17,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set matrix for test
         id: set-matrix
         run: echo "matrix=$(find . -name '*.test.ts' | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
@@ -31,12 +31,12 @@ jobs:
       - prepare-matrix
     steps:
       - name: "☁️ checkout repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: "🔧 setup Bun"
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
 
       - name: "📦 install dependencies"
         run: bun install
@@ -46,7 +46,5 @@ jobs:
 
   compliance:
     uses: open-sauced/hot/.github/workflows/compliance.yml@main
-    needs: 
+    needs:
       - test
-
-  

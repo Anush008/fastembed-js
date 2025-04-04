@@ -1,2 +1,5 @@
-import { EmbeddingModel, ExecutionProvider, FlagEmbedding } from "./fastembed";
-export { EmbeddingModel, ExecutionProvider, FlagEmbedding };
+export {
+  EmbeddingModel,
+  ExecutionProvider,
+  FlagEmbedding,
+} from "./fastembed.js";

@@ -1,6 +1,6 @@
 {
   "name": "fastembed",
-  "version": "1.14.2",
+  "version": "1.14.3",
   "description": "NodeJS implementation of @Qdrant/fastembed",
   "keywords": [
     "embeddings",

@@ -30,6 +30,7 @@
   "files": [
     "lib/"
   ],
+  "sideEffects": false,
   "scripts": {
     "prepublishOnly": "npm run tsc",
     "test": "npm run tsc && vitest",

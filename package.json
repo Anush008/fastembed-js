@@ -34,7 +34,8 @@
   "scripts": {
     "prepublishOnly": "npm run tsc",
     "test": "npm run tsc && vitest",
-    "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json"
+    "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "posttsc": "echo '{\"type\": \"module\"}' > ./lib/esm/package.json"
   },
   "dependencies": {
     "@anush008/tokenizers": "^0.0.0",

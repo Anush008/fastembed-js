@@ -14,8 +14,11 @@ test("Init EmbeddingModel", async () => {
 });
 
 test("FlagEmbedding embed", async () => {
+  const pathModel = path.resolve(__dirname, "../models/customs");
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.CUSTOM,
+    modelAbsoluteDirPath: pathModel,
+    modelName: "mymodel.onnx",
     maxLength: 512,
   });
   const embeddings = (await flagEmbedding.embed(["This is a test"]).next())
@@ -25,8 +28,11 @@ test("FlagEmbedding embed", async () => {
 });
 
 test("FlagEmbedding embed batch", async () => {
+  const pathModel = path.resolve(__dirname, "../models/customs");
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.CUSTOM,
+    modelAbsoluteDirPath: pathModel,
+    modelName: "mymodel.onnx",
 
     maxLength: 512,
   });
@@ -46,8 +52,11 @@ test("FlagEmbedding embed batch", async () => {
 });
 
 test("FlagEmbedding embed small batch", async () => {
+  const pathModel = path.resolve(__dirname, "../models/customs");
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.CUSTOM,
+    modelAbsoluteDirPath: pathModel,
+    modelName: "mymodel.onnx",
     maxLength: 512,
   });
   const embeddingsBatch = flagEmbedding.embed(
@@ -62,8 +71,11 @@ test("FlagEmbedding embed small batch", async () => {
 });
 
 test("FlagEmbedding queryEmbed", async () => {
+  const pathModel = path.resolve(__dirname, "../models/customs");
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.CUSTOM,
+    modelAbsoluteDirPath: pathModel,
+    modelName: "mymodel.onnx",
     maxLength: 512,
   });
   const embeddings = await flagEmbedding.queryEmbed("This is a test");
@@ -72,8 +84,11 @@ test("FlagEmbedding queryEmbed", async () => {
 });
 
 test("FlagEmbedding passageEmbed", async () => {
+  const pathModel = path.resolve(__dirname, "../models/customs");
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.CUSTOM,
+    modelAbsoluteDirPath: pathModel,
+    modelName: "mymodel.onnx",
 
     maxLength: 512,
   });
@@ -85,16 +100,22 @@ test("FlagEmbedding passageEmbed", async () => {
 });
 
 test("FlagEmbedding canonical values", async () => {
+  const pathModel = path.resolve(__dirname, "../models/customs");
   const flagEmbedding = await FlagEmbedding.init({
-    model: EmbeddingModel.AllMiniLML6V2,
+    model: EmbeddingModel.CUSTOM,
+    modelAbsoluteDirPath: pathModel,
+    modelName: "mymodel.onnx",
     maxLength: 512,
   });
   const expected = [
-    0.02591, 0.00573, 0.01147, 0.03796, -0.0232, -0.0549, 0.01404, -0.0107,
-    -0.0244, -0.01822,
+    0.025276897475123405, 0.013033483177423477, 0.005586996208876371,
+    0.04152565822005272, -0.018848471343517303, -0.05523142218589783,
+    0.018086062744259834, -0.000535094877704978, -0.013765564188361168,
+    -0.016923097893595695,
   ];
 
   const embeddings = (await flagEmbedding.embed(["hello world"]).next()).value!;
+  console.log("embeddings", embeddings[0].slice(0, 10));
   expect(embeddings).toBeDefined();
   for (let i = 0; i < expected.length; i++) {
     expect(embeddings[0][i]).toBeCloseTo(expected[i], 3);

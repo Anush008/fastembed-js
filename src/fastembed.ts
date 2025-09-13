@@ -1,10 +1,10 @@
+import { AddedToken, Tokenizer } from "@anush008/tokenizers";
 import fs, { PathLike } from "fs";
 import https from "https";
+import * as ort from "onnxruntime-node";
 import path from "path";
 import Progress from "progress";
 import tar from "tar";
-import { AddedToken, Tokenizer } from "@anush008/tokenizers";
-import * as ort from "onnxruntime-node";
 
 export enum ExecutionProvider {
   CPU = "cpu",
@@ -22,14 +22,14 @@ export enum EmbeddingModel {
   BGESmallENV15 = "fast-bge-small-en-v1.5",
   BGESmallZH = "fast-bge-small-zh-v1.5",
   MLE5Large = "fast-multilingual-e5-large",
+  CUSTOM = "custom",
 }
 
-interface InitOptions {
-  model: EmbeddingModel;
-  executionProviders: ExecutionProvider[];
-  maxLength: number;
-  cacheDir: string;
-  showDownloadProgress: boolean;
+export interface InitOptionsBase {
+  executionProviders?: ExecutionProvider[];
+  maxLength?: number;
+  cacheDir?: string;
+  showDownloadProgress?: boolean;
 }
 
 interface ModelInfo {
@@ -86,7 +86,20 @@ function getEmbeddings(
 
 //   return resultArray;
 // }
+// Cas standard
+export interface InitStandardOptions extends InitOptionsBase {
+  model: Exclude<EmbeddingModel, EmbeddingModel.CUSTOM>;
+  modelAbsoluteDirPath?: undefined;
+  modelName?: string;
+}
 
+// Cas custom
+export interface InitCustomOptions extends InitOptionsBase {
+  model: EmbeddingModel.CUSTOM;
+  modelAbsoluteDirPath: fs.PathLike;
+  modelName: string;
+}
+export type InitOptions = InitStandardOptions | InitCustomOptions;
 abstract class Embedding {
   abstract listSupportedModels(): ModelInfo[];
 
@@ -111,28 +124,47 @@ export class FlagEmbedding extends Embedding {
   ) {
     super();
   }
-
+  static async init(options: InitStandardOptions): Promise<FlagEmbedding>;
+  static async init(options: InitCustomOptions): Promise<FlagEmbedding>;
   static async init({
     model = EmbeddingModel.BGESmallENV15,
     executionProviders = [ExecutionProvider.CPU],
     maxLength = 512,
     cacheDir = "local_cache",
     showDownloadProgress = true,
+    modelAbsoluteDirPath = "",
+    modelName = "",
   }: Partial<InitOptions> = {}) {
-    const modelDir = await FlagEmbedding.retrieveModel(
-      model,
-      cacheDir,
-      showDownloadProgress
-    );
+    if (model === EmbeddingModel.CUSTOM) {
+      if (!modelAbsoluteDirPath) {
+        throw new Error(
+          "For custom model, modelAbsoluteDirPath is required in FlagEmbedding.init"
+        );
+      }
+      if (!modelName) {
+        throw new Error(
+          "For custom model, modelName is required in FlagEmbedding.init"
+        );
+      }
+    }
+    const modelDir =
+      model === EmbeddingModel.CUSTOM
+        ? modelAbsoluteDirPath
+        : await FlagEmbedding.retrieveModel(
+            model,
+            cacheDir,
+            showDownloadProgress
+          );
 
     const tokenizer = this.loadTokenizer(modelDir, maxLength);
-
+    const defaultModelName =
+      model === EmbeddingModel.MLE5Large ||
+      model === EmbeddingModel.AllMiniLML6V2
+        ? "model.onnx"
+        : "model_optimized.onnx";
     const modelPath = path.join(
       modelDir.toString(),
-      model === EmbeddingModel.MLE5Large ||
-        model === EmbeddingModel.AllMiniLML6V2
-        ? "model.onnx"
-        : "model_optimized.onnx",
+      modelName || defaultModelName
     );
     if (!fs.existsSync(modelPath)) {
       throw new Error(`Model file not found at ${modelPath}`);

@@ -768,6 +768,7 @@ export class SparseTextEmbedding extends SparseEmbedding {
       const output = await this.session.run(inputs);
 
       // SPLADE postprocessing: log(1 + ReLU(logits))
+      // @ts-expect-error this is incorrect it is there?
       const logits = output.output.cpuData as Float32Array;
       const dims = output.output.dims as [number, number, number];
       const [currentBatchSize, seqLen, vocabSize] = dims;

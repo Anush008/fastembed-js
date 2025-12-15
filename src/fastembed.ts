@@ -32,7 +32,10 @@ export enum SparseEmbeddingModel {
 }
 
 // Sparse embedding types
-export type SparseVector = Array<{ tokenId: number; score: number }>;
+export type SparseVector = {
+  values: number[],
+  indices: number[]
+}
 
 export interface InitOptionsBase {
   executionProviders?: ExecutionProvider[];
@@ -801,19 +804,16 @@ export class SparseTextEmbedding extends SparseEmbedding {
         }
 
         // Convert to sparse representation (only non-zero values)
-        const sparseVector: SparseVector = [];
+        const sparseVector: SparseVector = {
+          values: [],
+          indices: []
+        };
         for (let tokenId = 0; tokenId < vocabSize; tokenId++) {
           if (values[tokenId] > 0) {
-            sparseVector.push({
-              tokenId,
-              score: values[tokenId],
-            });
+            sparseVector.indices.push(tokenId)
+            sparseVector.values.push(values[tokenId])
           }
         }
-
-        // Sort by score descending
-        sparseVector.sort((a, b) => b.score - a.score);
-
         sparseVectors.push(sparseVector);
       }
 

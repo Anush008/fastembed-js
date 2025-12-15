@@ -21,23 +21,16 @@ test("SparseTextEmbedding embed", async () => {
 
   // Verify sparse vector structure
   const sparseVector = embeddings[0];
-  expect(Array.isArray(sparseVector)).toBe(true);
-  expect(sparseVector.length).toBeGreaterThan(0);
+  expect(Array.isArray(sparseVector.indices)).toBe(true);
+  expect(Array.isArray(sparseVector.values)).toBe(true);
+  expect(sparseVector.values.length).toBeGreaterThan(0);
+  expect(sparseVector.indices.length).toBe(sparseVector.values.length);
 
-  // Verify each element has tokenId and score
-  sparseVector.forEach((item) => {
-    expect(item).toHaveProperty("tokenId");
-    expect(item).toHaveProperty("score");
-    expect(typeof item.tokenId).toBe("number");
-    expect(typeof item.score).toBe("number");
-    expect(item.score).toBeGreaterThan(0);
-  });
-
-  // Verify sorted by score descending
-  for (let i = 1; i < sparseVector.length; i++) {
-    expect(sparseVector[i - 1].score).toBeGreaterThanOrEqual(
-      sparseVector[i].score
-    );
+  // Verify each element
+  for (let i = 0; i < sparseVector.values.length; i++) {
+    expect(typeof sparseVector.indices[i]).toBe("number");
+    expect(typeof sparseVector.values[i]).toBe("number");
+    expect(sparseVector.values[i]).toBeGreaterThan(0);
   }
 }, 60000);
 
@@ -64,8 +57,9 @@ test("SparseTextEmbedding embed batch", async () => {
 
     // Verify each embedding is a sparse vector
     embeddings.forEach((sparseVector) => {
-      expect(Array.isArray(sparseVector)).toBe(true);
-      expect(sparseVector.length).toBeGreaterThan(0);
+      expect(Array.isArray(sparseVector.indices)).toBe(true);
+      expect(Array.isArray(sparseVector.values)).toBe(true);
+      expect(sparseVector.values.length).toBeGreaterThan(0);
     });
   }
 }, 60000);
@@ -90,8 +84,9 @@ test("SparseTextEmbedding embed small batch", async () => {
   for await (const embeddings of embeddingsBatch) {
     expect(embeddings).toBeDefined();
     expect(embeddings.length).toBe(1);
-    expect(Array.isArray(embeddings[0])).toBe(true);
-    expect(embeddings[0].length).toBeGreaterThan(0);
+    expect(Array.isArray(embeddings[0].indices)).toBe(true);
+    expect(Array.isArray(embeddings[0].values)).toBe(true);
+    expect(embeddings[0].values.length).toBeGreaterThan(0);
   }
 }, 60000);
 
@@ -104,14 +99,10 @@ test("SparseTextEmbedding queryEmbed", async () => {
   const embedding = await sparseEmbedding.queryEmbed("This is a test");
 
   expect(embedding).toBeDefined();
-  expect(Array.isArray(embedding)).toBe(true);
-  expect(embedding.length).toBeGreaterThan(0);
-
-  // Verify structure
-  embedding.forEach((item) => {
-    expect(item).toHaveProperty("tokenId");
-    expect(item).toHaveProperty("score");
-  });
+  expect(Array.isArray(embedding.indices)).toBe(true);
+  expect(Array.isArray(embedding.values)).toBe(true);
+  expect(embedding.values.length).toBeGreaterThan(0);
+  expect(embedding.indices.length).toBe(embedding.values.length);
 }, 60000);
 
 test("SparseTextEmbedding passageEmbed", async () => {
@@ -126,7 +117,8 @@ test("SparseTextEmbedding passageEmbed", async () => {
 
   expect(embeddings).toBeDefined();
   expect(embeddings.length).toBe(1);
-  expect(Array.isArray(embeddings[0])).toBe(true);
+  expect(Array.isArray(embeddings[0].indices)).toBe(true);
+  expect(Array.isArray(embeddings[0].values)).toBe(true);
 }, 60000);
 
 test("SparseTextEmbedding sparsity", async () => {
@@ -141,14 +133,14 @@ test("SparseTextEmbedding sparsity", async () => {
 
   // SPLADE typically produces ~100-200 non-zero dimensions out of 30522
   // Verify it's actually sparse
-  expect(embedding.length).toBeLessThan(1000); // Should be much less than vocab size
-  expect(embedding.length).toBeGreaterThan(10); // But should have some meaningful tokens
+  expect(embedding.values.length).toBeLessThan(1000); // Should be much less than vocab size
+  expect(embedding.values.length).toBeGreaterThan(10); // But should have some meaningful tokens
 
-  console.log(`Sparse vector has ${embedding.length} non-zero dimensions`);
+  console.log(`Sparse vector has ${embedding.values.length} non-zero dimensions`);
   console.log(
-    `Top 5 tokens: ${embedding
+    `Top 5 tokens: ${embedding.indices
       .slice(0, 5)
-      .map((e) => `${e.tokenId}:${e.score.toFixed(3)}`)
+      .map((tokenId, i) => `${tokenId}:${embedding.values[i].toFixed(3)}`)
       .join(", ")}`
   );
 }, 60000);

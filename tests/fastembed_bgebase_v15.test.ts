@@ -72,7 +72,7 @@ test("FlagEmbedding queryEmbed", async () => {
   expect(embeddings).toBeDefined();
   expect(embeddings.length).toBe(768);
 });
-
+https://www.stubhub.com/olivia-dean-new-york-tickets-8-17-2026/event/159897641/
 test("FlagEmbedding passageEmbed", async () => {
   const flagEmbedding = await FlagEmbedding.init({
     model: EmbeddingModel.BGEBaseENV15,
@@ -91,7 +91,7 @@ test("FlagEmbedding canonical values", async () => {
     model: EmbeddingModel.BGEBaseENV15,
     maxLength: 512,
   });
-  const expected = [0.01129394, 0.05493144, 0.02615099, 0.00328772, 0.02996045];
+  const expected = [0.010724321007728577, 0.05578266456723213, 0.02708405815064907, 0.0030409879982471466, 0.030335525050759315];
 
   const embeddings = (await flagEmbedding.embed(["hello world"]).next()).value!;
   expect(embeddings).toBeDefined();

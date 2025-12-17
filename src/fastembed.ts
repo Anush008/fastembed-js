@@ -112,13 +112,24 @@ export interface InitStandardOptions extends InitOptionsBase {
   modelName?: string;
 }
 
-// Cas custom
+// Cas custom local
 export interface InitCustomOptions extends InitOptionsBase {
   model: EmbeddingModel.CUSTOM;
   modelAbsoluteDirPath: fs.PathLike;
   modelName: string;
 }
-export type InitOptions = InitStandardOptions | InitCustomOptions;
+
+// Cas custom HuggingFace repo
+export interface InitCustomHFOptions extends InitOptionsBase {
+  model: string; // Any HuggingFace repo ID
+  modelAbsoluteDirPath?: undefined;
+  modelName?: string;
+}
+
+export type InitOptions =
+  | InitStandardOptions
+  | InitCustomOptions
+  | InitCustomHFOptions;
 
 // Sparse embedding init options
 export interface InitSparseStandardOptions extends InitOptionsBase {

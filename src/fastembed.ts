@@ -6,6 +6,7 @@ import path from "path";
 import Progress from "progress";
 import tar from "tar";
 import { downloadFileToCacheDir } from "@huggingface/hub";
+import { DENSE_MODEL_REGISTRY } from "./dense-model-registry.js";
 
 export enum ExecutionProvider {
   CPU = "cpu",
@@ -16,13 +17,13 @@ export enum ExecutionProvider {
 }
 
 export enum EmbeddingModel {
-  AllMiniLML6V2 = "fast-all-MiniLM-L6-v2",
-  BGEBaseEN = "fast-bge-base-en",
-  BGEBaseENV15 = "fast-bge-base-en-v1.5",
-  BGESmallEN = "fast-bge-small-en",
-  BGESmallENV15 = "fast-bge-small-en-v1.5",
-  BGESmallZH = "fast-bge-small-zh-v1.5",
-  MLE5Large = "fast-multilingual-e5-large",
+  AllMiniLML6V2 = "sentence-transformers/all-MiniLM-L6-v2",
+  BGEBaseEN = "BAAI/bge-base-en",
+  BGEBaseENV15 = "BAAI/bge-base-en-v1.5",
+  BGESmallEN = "BAAI/bge-small-en",
+  BGESmallENV15 = "BAAI/bge-small-en-v1.5",
+  BGESmallZH = "BAAI/bge-small-zh-v1.5",
+  MLE5Large = "intfloat/multilingual-e5-large",
   CUSTOM = "custom",
 }
 
@@ -111,13 +112,24 @@ export interface InitStandardOptions extends InitOptionsBase {
   modelName?: string;
 }
 
-// Cas custom
+// Cas custom local
 export interface InitCustomOptions extends InitOptionsBase {
   model: EmbeddingModel.CUSTOM;
   modelAbsoluteDirPath: fs.PathLike;
   modelName: string;
 }
-export type InitOptions = InitStandardOptions | InitCustomOptions;
+
+// Cas custom HuggingFace repo
+export interface InitCustomHFOptions extends InitOptionsBase {
+  model: string; // Any HuggingFace repo ID
+  modelAbsoluteDirPath?: undefined;
+  modelName?: string;
+}
+
+export type InitOptions =
+  | InitStandardOptions
+  | InitCustomOptions
+  | InitCustomHFOptions;
 
 // Sparse embedding init options
 export interface InitSparseStandardOptions extends InitOptionsBase {
@@ -178,6 +190,7 @@ export class FlagEmbedding extends Embedding {
   }
   static async init(options: InitStandardOptions): Promise<FlagEmbedding>;
   static async init(options: InitCustomOptions): Promise<FlagEmbedding>;
+  static async init(options: InitCustomHFOptions): Promise<FlagEmbedding>;
   static async init({
     model = EmbeddingModel.BGESmallENV15,
     executionProviders = [ExecutionProvider.CPU],
@@ -209,15 +222,15 @@ export class FlagEmbedding extends Embedding {
           );
 
     const tokenizer = this.loadTokenizer(modelDir, maxLength);
-    const defaultModelName =
-      model === EmbeddingModel.MLE5Large ||
-      model === EmbeddingModel.AllMiniLML6V2
-        ? "model.onnx"
-        : "model_optimized.onnx";
+
+    // Use metadata to determine ONNX file path
+    const metadata = DENSE_MODEL_REGISTRY[model];
+    const onnxFileName = metadata?.onnxFilePath || "onnx/model.onnx";
     const modelPath = path.join(
       modelDir.toString(),
-      modelName || defaultModelName
+      modelName || onnxFileName
     );
+
     if (!fs.existsSync(modelPath)) {
       throw new Error(`Model file not found at ${modelPath}`);
     }
@@ -225,7 +238,7 @@ export class FlagEmbedding extends Embedding {
       executionProviders,
       graphOptimizationLevel: "all",
     });
-    return new FlagEmbedding(tokenizer, session, model);
+    return new FlagEmbedding(tokenizer, session, model as EmbeddingModel);
   }
 
   private static loadTokenizer(
@@ -374,10 +387,103 @@ export class FlagEmbedding extends Embedding {
     }
   }
 
-  private static async retrieveModel(
-    model: EmbeddingModel,
+  private static async retrieveModelHuggingFace(
+    model: string,
     cacheDir: PathLike,
     showDownloadProgress: boolean = true
+  ): Promise<PathLike> {
+    // Sanitize model name for filesystem (Org/Model → Org--Model)
+    const modelDir = path.join(
+      cacheDir.toString(),
+      model.replace(/\//g, "--")
+    );
+
+    // Check if already cached
+    if (fs.existsSync(modelDir)) {
+      const requiredFiles = [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "special_tokens_map.json",
+      ];
+      const allFilesExist = requiredFiles.every((file) =>
+        fs.existsSync(path.join(modelDir, file))
+      );
+      if (allFilesExist) {
+        if (showDownloadProgress) {
+          console.log(`Model ${model} found in cache`);
+        }
+        return modelDir;
+      }
+    }
+
+    // Get model metadata
+    const metadata = DENSE_MODEL_REGISTRY[model];
+
+    try {
+      // Try HuggingFace first
+      if (!fs.existsSync(modelDir)) {
+        fs.mkdirSync(modelDir, { mode: 0o777, recursive: true });
+      }
+
+      const filesToDownload = [
+        metadata?.onnxFilePath || "onnx/model.onnx", // e.g., "onnx/model.onnx"
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "config.json",
+        "special_tokens_map.json",
+      ];
+
+      if (showDownloadProgress) {
+        console.log(`Downloading ${model} from HuggingFace...`);
+      }
+
+      for (const fileName of filesToDownload) {
+        const outputPath = path.join(modelDir, fileName);
+        const outputDir = path.dirname(outputPath);
+
+        if (!fs.existsSync(outputDir)) {
+          fs.mkdirSync(outputDir, { recursive: true, mode: 0o777 });
+        }
+
+        // Use HuggingFace Hub library (same as sparse embeddings)
+        const downloaded = await downloadFileToCacheDir({
+          repo: model,
+          path: fileName,
+        });
+
+        if (downloaded && typeof downloaded === "string") {
+          fs.copyFileSync(downloaded, outputPath);
+        }
+      }
+
+      if (showDownloadProgress) {
+        console.log(`Successfully downloaded ${model}`);
+      }
+
+      return modelDir;
+    } catch (error) {
+      // Fallback to GCS if HuggingFace fails
+      if (metadata?.gcsUrl) {
+        console.warn(`HuggingFace download failed, falling back to GCS...`);
+        return await FlagEmbedding.retrieveModel(
+          model as EmbeddingModel,
+          cacheDir,
+          showDownloadProgress,
+          true // force GCS
+        );
+      }
+      throw new Error(
+        `Failed to download ${model} from HuggingFace: ${error}. No GCS fallback available.`
+      );
+    }
+  }
+
+  private static async retrieveModel(
+    model: EmbeddingModel | string,
+    cacheDir: PathLike,
+    showDownloadProgress: boolean = true,
+    forceGCS: boolean = false
   ): Promise<PathLike> {
     if (!fs.existsSync(cacheDir)) {
       fs.mkdirSync(cacheDir, {
@@ -385,17 +491,36 @@ export class FlagEmbedding extends Embedding {
       });
     }
 
-    const modelDir = path.join(cacheDir.toString(), model);
+    // Use GCS if forced (fallback scenario)
+    if (forceGCS) {
+      const modelDir = path.join(cacheDir.toString(), model);
 
-    if (fs.existsSync(modelDir)) {
+      if (fs.existsSync(modelDir)) {
+        return modelDir;
+      }
+
+      const modelTarGz = path.join(cacheDir.toString(), `${model}.tar.gz`);
+      await this.downloadFileFromGCS(modelTarGz, model, showDownloadProgress);
+      await this.decompressToCache(modelTarGz, cacheDir);
+      fs.unlinkSync(modelTarGz);
       return modelDir;
     }
 
-    const modelTarGz = path.join(cacheDir.toString(), `${model}.tar.gz`);
-    await this.downloadFileFromGCS(modelTarGz, model, showDownloadProgress);
-    await this.decompressToCache(modelTarGz, cacheDir);
-    fs.unlinkSync(modelTarGz);
-    return modelDir;
+    // Try HuggingFace first for known models
+    if (DENSE_MODEL_REGISTRY[model]) {
+      return await FlagEmbedding.retrieveModelHuggingFace(
+        model,
+        cacheDir,
+        showDownloadProgress
+      );
+    }
+
+    // For custom models not in registry, try HuggingFace anyway
+    return await FlagEmbedding.retrieveModelHuggingFace(
+      model,
+      cacheDir,
+      showDownloadProgress
+    );
   }
 
   async *embed(textStrings: string[], batchSize: number = 256) {
@@ -444,8 +569,9 @@ export class FlagEmbedding extends Embedding {
         token_type_ids: batchTokenTypeId,
       };
 
-      // Exclude token_type_ids for MLE5Large
-      if (this.model === EmbeddingModel.MLE5Large) {
+      // Use metadata to determine if token_type_ids is needed
+      const metadata = DENSE_MODEL_REGISTRY[this.model];
+      if (metadata && !metadata.requiresTokenTypeIds) {
         delete inputs.token_type_ids;
       }
 
@@ -496,44 +622,11 @@ export class FlagEmbedding extends Embedding {
   }
 
   listSupportedModels(): ModelInfo[] {
-    return [
-      {
-        model: EmbeddingModel.BGESmallEN,
-        dim: 384,
-        description: "Fast English model",
-      },
-      {
-        model: EmbeddingModel.BGESmallENV15,
-        dim: 384,
-        description: "v1.5 release of the fast, default English model",
-      },
-      {
-        model: EmbeddingModel.BGEBaseEN,
-        dim: 768,
-        description: "Base English model",
-      },
-      {
-        model: EmbeddingModel.BGEBaseENV15,
-        dim: 768,
-        description: "v1.5 release of Base English model",
-      },
-      {
-        model: EmbeddingModel.BGESmallZH,
-        dim: 512,
-        description: "v1.5 release of the fast, Chinese model",
-      },
-      {
-        model: EmbeddingModel.AllMiniLML6V2,
-        dim: 384,
-        description: "Sentence Transformer model, MiniLM-L6-v2",
-      },
-      {
-        model: EmbeddingModel.MLE5Large,
-        dim: 1024,
-        description:
-          "Multilingual model, e5-large. Recommend using this model for non-English languages",
-      },
-    ];
+    return Object.entries(DENSE_MODEL_REGISTRY).map(([id, metadata]) => ({
+      model: id as EmbeddingModel,
+      dim: metadata.dim,
+      description: metadata.description,
+    }));
   }
 }
 

@@ -190,6 +190,7 @@ export class FlagEmbedding extends Embedding {
   }
   static async init(options: InitStandardOptions): Promise<FlagEmbedding>;
   static async init(options: InitCustomOptions): Promise<FlagEmbedding>;
+  static async init(options: InitCustomHFOptions): Promise<FlagEmbedding>;
   static async init({
     model = EmbeddingModel.BGESmallENV15,
     executionProviders = [ExecutionProvider.CPU],
@@ -221,15 +222,15 @@ export class FlagEmbedding extends Embedding {
           );
 
     const tokenizer = this.loadTokenizer(modelDir, maxLength);
-    const defaultModelName =
-      model === EmbeddingModel.MLE5Large ||
-      model === EmbeddingModel.AllMiniLML6V2
-        ? "model.onnx"
-        : "model_optimized.onnx";
+
+    // Use metadata to determine ONNX file path
+    const metadata = DENSE_MODEL_REGISTRY[model];
+    const onnxFileName = metadata?.onnxFilePath || "onnx/model.onnx";
     const modelPath = path.join(
       modelDir.toString(),
-      modelName || defaultModelName
+      modelName || onnxFileName
     );
+
     if (!fs.existsSync(modelPath)) {
       throw new Error(`Model file not found at ${modelPath}`);
     }
@@ -237,7 +238,7 @@ export class FlagEmbedding extends Embedding {
       executionProviders,
       graphOptimizationLevel: "all",
     });
-    return new FlagEmbedding(tokenizer, session, model);
+    return new FlagEmbedding(tokenizer, session, model as EmbeddingModel);
   }
 
   private static loadTokenizer(

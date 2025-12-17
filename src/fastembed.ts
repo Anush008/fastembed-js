@@ -569,8 +569,9 @@ export class FlagEmbedding extends Embedding {
         token_type_ids: batchTokenTypeId,
       };
 
-      // Exclude token_type_ids for MLE5Large
-      if (this.model === EmbeddingModel.MLE5Large) {
+      // Use metadata to determine if token_type_ids is needed
+      const metadata = DENSE_MODEL_REGISTRY[this.model];
+      if (metadata && !metadata.requiresTokenTypeIds) {
         delete inputs.token_type_ids;
       }
 
@@ -621,44 +622,11 @@ export class FlagEmbedding extends Embedding {
   }
 
   listSupportedModels(): ModelInfo[] {
-    return [
-      {
-        model: EmbeddingModel.BGESmallEN,
-        dim: 384,
-        description: "Fast English model",
-      },
-      {
-        model: EmbeddingModel.BGESmallENV15,
-        dim: 384,
-        description: "v1.5 release of the fast, default English model",
-      },
-      {
-        model: EmbeddingModel.BGEBaseEN,
-        dim: 768,
-        description: "Base English model",
-      },
-      {
-        model: EmbeddingModel.BGEBaseENV15,
-        dim: 768,
-        description: "v1.5 release of Base English model",
-      },
-      {
-        model: EmbeddingModel.BGESmallZH,
-        dim: 512,
-        description: "v1.5 release of the fast, Chinese model",
-      },
-      {
-        model: EmbeddingModel.AllMiniLML6V2,
-        dim: 384,
-        description: "Sentence Transformer model, MiniLM-L6-v2",
-      },
-      {
-        model: EmbeddingModel.MLE5Large,
-        dim: 1024,
-        description:
-          "Multilingual model, e5-large. Recommend using this model for non-English languages",
-      },
-    ];
+    return Object.entries(DENSE_MODEL_REGISTRY).map(([id, metadata]) => ({
+      model: id as EmbeddingModel,
+      dim: metadata.dim,
+      description: metadata.description,
+    }));
   }
 }
 
